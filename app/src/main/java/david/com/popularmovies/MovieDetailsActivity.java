@@ -3,6 +3,7 @@ package david.com.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -12,8 +13,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -62,10 +65,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private ImageButton mFavStar;
     protected TextView movieSummary;
     private LinearLayout linearLayout;
+    private TextView txtMoviePlay;
     private ExpandableTextView expandableTextView;
     private HashMap movieSelected;
     private boolean mIsFavourite;
     private String[] videoKeys;
+    private int nextKey = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,14 +86,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
         userRating = (TextView) findViewById(R.id.txtMovieUserRating);
         releaseDate = (TextView) findViewById(R.id.txtMovieReleaseDate);
         movieSummary = (TextView) findViewById(R.id.txtMovieSummary);
-        mFavStar = (ImageButton) findViewById(R.id.imgFavStar);
-        linearLayout = (LinearLayout) findViewById(R.id.ll_play_trailer);
-        linearLayout.setOnClickListener(new View.OnClickListener() {
+        txtMoviePlay = (TextView) findViewById(R.id.txtMoviePlay);
+        txtMoviePlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playTrailer();
+                playTrailer(videoKeys[0]);
             }
         });
+        mFavStar = (ImageButton) findViewById(R.id.imgFavStar);
+        linearLayout = (LinearLayout) findViewById(R.id.ll_play_trailer);
         expandableTextView = (ExpandableTextView) findViewById(R.id.expandable_text_view);
 
         Bundle bundle = this.getIntent().getExtras();
@@ -123,15 +129,21 @@ public class MovieDetailsActivity extends AppCompatActivity {
         Log.d(TAG, "exiting onCreate");
     }
 
-    private void playTrailer() {
-        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + videoKeys[0]));
+    private void playTrailer(String trailerId) {
+        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + trailerId));
+
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailerId));
+
+//        PackageManager packageManager = getPackageManager();
+//        List activities = packageManager.queryIntentActivities(webIntent, PackageManager.MATCH_DEFAULT_ONLY);
+//        boolean isIntentSafe = activities.size() > 0;
 
         PackageManager packageManager = getPackageManager();
-        List activities = packageManager.queryIntentActivities(webIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        List activities = packageManager.queryIntentActivities(appIntent, PackageManager.MATCH_DEFAULT_ONLY);
         boolean isIntentSafe = activities.size() > 0;
 
         if(isIntentSafe){
-            startActivity(webIntent);
+            startActivity(appIntent);
         }
     }
 
@@ -172,7 +184,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         Log.d(TAG, "poster path is: " + movie.get("posterPath"));
     }
 
-    //TODO url to pass to youtube to watch trailer: https://www.youtube.com/watch?v= (youtubeKey)
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -218,8 +229,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String theMovieDbSearchResults) {
             Log.d(TAG, "entering onPostExecute");
-//            String[] reviews;
-//            String[] authors;
             if (theMovieDbSearchResults != null && !theMovieDbSearchResults.equals("")) {
                 Log.d(TAG, theMovieDbSearchResults);
                 JSONObject jsonObject = JsonUtils.getJSONObject(theMovieDbSearchResults);
@@ -275,9 +284,42 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
 
             for(int i = 0; i < videoKeys.length; ++i){
-                //expandableTextView.setText(expandableTextView.getText() + authors[i] + ":" + "\n\"" + reviews[i] + "\"\n\n          -----------------------------------------------\n\n");
                 Log.d(TAG, "key is: " + videoKeys[i]);
             }
+
+            if(videoKeys.length > 1) addExtraTrailerViewsIfNeeded();
         }
+    }
+
+    private void addExtraTrailerViewsIfNeeded() {
+
+        float scale = getResources().getDisplayMetrics().density;
+        int topPd = (int) (12 * scale + 0.5f);
+        int leftPd = (int) (8 * scale + 0.5f);
+
+        for(int i = 1; i < videoKeys.length; ++i){                  //starting at 1 as have already given index 0 to TextBox displayed
+            TextView textView = new TextView(this);
+            textView.setText("Trailer " + (i + 1));
+
+            textView.setPadding(leftPd, topPd, 0, 0);
+            textView.setTextSize(16);
+            textView.setGravity(Gravity.CENTER);
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    playTrailer(videoKeys[getNextKey()]);
+                }
+            });
+
+            textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.play, 0, 0, 0);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            //params.gravity = Gravity.BOTTOM;
+            textView.setLayoutParams(params);
+            linearLayout.addView(textView);
+        }
+    }
+
+    private int getNextKey() {
+        return nextKey++;
     }
 }
