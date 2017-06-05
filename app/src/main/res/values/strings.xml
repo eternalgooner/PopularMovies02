@@ -1,0 +1,27 @@
+<resources>
+
+    <!-- menu options -->
+    <string name="most_popular">Most popular</string>
+    <string name="highest_rated">Highest rated</string>
+
+    <!-- image content desriptions -->
+    <string name="movie_poster_image_content_description">movie poster image</string>
+
+    <!-- display messages to user -->
+    <string name="message_no_network">please check your network connection and try again</string>
+
+    <!-- network request strings -->
+    <string name="url_poster_prefix">http://image.tmdb.org/t/p/w500/</string>
+    <string name="base_url_top_rated">https://api.themoviedb.org/3/movie/top_rated?api_key=</string>
+    <string name="base_url_popular">https://api.themoviedb.org/3/movie/popular?api_key=</string>
+    <string name="base_url">https://api.themoviedb.org/3/movie/</string>
+
+    <!-- Activity titles -->
+    <string name="title_movie_details">Movie Details</string>
+    <string name="app_name">Popular Movies</string>
+    <string name="dummy_text_review">\"I thought this movie was very good. I heard it wasn\'t supposed to be that good. Even though so much money was spent on this, it surprised me how good it was.\"
+    </string>
+    <string name="menu_favourites">Favourites</string>
+
+
+</resources>
