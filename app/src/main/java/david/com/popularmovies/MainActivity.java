@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private ArrayList<HashMap> movieList;
     private GridLayoutManager gridLayoutManager;
     private boolean showingMostPopular = true;
+    private boolean showingFavList = false;
     private Bundle movieBundle = new Bundle();
     private SQLiteDatabase mDb;
 
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 if(!showingMostPopular) showMostPopular();
                 break;
             case R.id.menu_highest_rated:
-                if(showingMostPopular) showHighestRated();
+                if(showingMostPopular || showingFavList) showHighestRated();
                 break;
             case R.id.menu_favourites:
                 showFavourites();
@@ -161,19 +162,23 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void showFavourites() {
         //TODO implement
+        showingMostPopular = false; //TODO fix bug - need to be able to go back to either most pop or highest rated from FAV - need to change boolean
+        showingFavList = true;
         Cursor cursor = getAllMovies();
-        mMovieAdapter = new MovieAdapter(this, cursor);
+        mMovieAdapter = new MovieAdapter(this, cursor, this);
         mRecyclerView.setAdapter(mMovieAdapter);
         Toast.makeText(this, "show favs", Toast.LENGTH_SHORT).show();
     }
 
     private void showHighestRated() {
         showingMostPopular = false;
+        showingFavList = false;
         loadMovieList("highestRated");
     }
 
     private void showMostPopular() {
         showingMostPopular = true;
+        showingFavList = false;
         loadMovieList("mostPopular");
     }
 

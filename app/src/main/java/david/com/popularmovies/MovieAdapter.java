@@ -2,6 +2,7 @@ package david.com.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -44,18 +46,26 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         isFavAdapter = false;
     }
 
-    public MovieAdapter(Context context, Cursor cursor){
+    public MovieAdapter(Context context, Cursor cursor, ListItemClickListener clickListener){
         mNumItems = cursor.getCount();
         this.context = context;
         mCursor = cursor;
         isFavAdapter = true;
+        onClickListener = clickListener;
     }
 
     @Override
     public MovieAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.d(TAG, "entering onCreateViewHolder");
         context = parent.getContext();
-        int layoutIdForListItem = R.layout.thumbnail_layout;
+        int layoutIdForListItem = 0;
+
+        if(!isFavAdapter){
+            layoutIdForListItem = R.layout.thumbnail_layout;
+        }else if(isFavAdapter){
+            layoutIdForListItem = R.layout.fav_layout;
+        }
+
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(layoutIdForListItem, parent, false);
@@ -67,9 +77,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
         Log.d(TAG, "entering onBindViewHolder");
-        Log.d(TAG, mPosterPaths[position]);
+
         //int width = context.getResources().getDisplayMetrics().widthPixels;
         if(!isFavAdapter){
+            Log.d(TAG, mPosterPaths[position]);
             Picasso.with(context).load(mPosterPaths[position]).into(holder.mImageView);
         }else if(isFavAdapter){
             if(!mCursor.moveToPosition(position)){
@@ -83,6 +94,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             String review = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW));
 
             Log.d(TAG, "all details retrieved from DB are: " + title + " : " + rating + " : " + year + " : " + summary + " : " + trailer + " : " + review);
+
+            holder.mTextView.setText(title);
+            if(position % 2 == 0){
+                holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
+            }else{
+                holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+                holder.mTextView.setTextColor(Color.WHITE);
+            }
         }
 
         Log.d(TAG, "exiting onBindViewHolder");
@@ -102,13 +121,21 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public final ImageView mImageView;
-        public final FrameLayout frameLayout;
+        public ImageView mImageView;
+        public FrameLayout frameLayout;
+
+        public TextView mTextView;
 
         public MovieAdapterViewHolder(View itemView) {
             super(itemView);
-            frameLayout = (FrameLayout) itemView.findViewById(R.id.gv_item_view);
-            mImageView = (ImageView) itemView.findViewById(R.id.item_imageView);
+            //frameLayout = (FrameLayout) itemView.findViewById(R.id.gv_item_view);
+
+            if(!isFavAdapter){
+                mImageView = (ImageView) itemView.findViewById(R.id.item_imageView);
+            }else if(isFavAdapter){
+                mTextView = (TextView) itemView.findViewById(R.id.fav_layout_item);
+            }
+
             itemView.setOnClickListener(this);
         }
 
