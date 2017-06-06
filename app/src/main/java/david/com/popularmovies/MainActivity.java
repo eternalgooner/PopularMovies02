@@ -3,6 +3,8 @@ package david.com.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private GridLayoutManager gridLayoutManager;
     private boolean showingMostPopular = true;
     private Bundle movieBundle = new Bundle();
+    private SQLiteDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         }else{
             txtNoNetworkMessage.setVisibility(View.VISIBLE);
         }
+
+        FavMoviesDbHelper dbHelper = new FavMoviesDbHelper(this);
+        mDb = dbHelper.getReadableDatabase();
+
         Log.d(TAG, "exiting onCreate");
     }
 
@@ -106,8 +113,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         mRecyclerView.setAdapter(mMovieAdapter);
         Log.d(TAG, "exiting showMovies");
     }
-
-    //TODO add "show favourites" as a menu option
 
     private void loadMovieList(String sortType) {
         Log.d(TAG, "entering loadMovieList");
@@ -156,6 +161,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void showFavourites() {
         //TODO implement
+        Cursor cursor = getAllMovies();
+        mMovieAdapter = new MovieAdapter(this, cursor);
+        mRecyclerView.setAdapter(mMovieAdapter);
         Toast.makeText(this, "show favs", Toast.LENGTH_SHORT).show();
     }
 
@@ -230,5 +238,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             movieList.add(movieMap);
             Log.d(TAG, "exiting getAllMovieData");
         }
+    }
+    private Cursor getAllMovies(){
+        return mDb.query(FavMoviesContract.FavMovieEntry.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 }

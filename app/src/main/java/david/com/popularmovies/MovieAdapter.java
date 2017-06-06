@@ -1,6 +1,7 @@
 package david.com.popularmovies;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,13 +31,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     private Context context;
     private int mNumItems;
     private static final String TAG = MovieAdapter.class.getSimpleName();
-    private final ListItemClickListener onClickListener;
+    private ListItemClickListener onClickListener;
     private String[] mPosterPaths;
+
+    private Cursor mCursor;
+    private boolean isFavAdapter;
 
     public MovieAdapter(String[] posterPaths, int numItems, ListItemClickListener clickListener){
         mNumItems = numItems;
         mPosterPaths = posterPaths;
         onClickListener = clickListener;
+        isFavAdapter = false;
+    }
+
+    public MovieAdapter(Context context, Cursor cursor){
+        mNumItems = cursor.getCount();
+        this.context = context;
+        mCursor = cursor;
+        isFavAdapter = true;
     }
 
     @Override
@@ -57,14 +69,35 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         Log.d(TAG, "entering onBindViewHolder");
         Log.d(TAG, mPosterPaths[position]);
         //int width = context.getResources().getDisplayMetrics().widthPixels;
-        Picasso.with(context).load(mPosterPaths[position]).into(holder.mImageView);
+        if(!isFavAdapter){
+            Picasso.with(context).load(mPosterPaths[position]).into(holder.mImageView);
+        }else if(isFavAdapter){
+            if(!mCursor.moveToPosition(position)){
+                return;
+            }
+            String title = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_TITLE));
+            String rating = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_RATING));
+            String year = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_YEAR));
+            String summary = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY));
+            String trailer = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER));
+            String review = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW));
+
+            Log.d(TAG, "all details retrieved from DB are: " + title + " : " + rating + " : " + year + " : " + summary + " : " + trailer + " : " + review);
+        }
+
         Log.d(TAG, "exiting onBindViewHolder");
     }
 
     @Override
     public int getItemCount() {
-        Log.d(TAG, "entering getItemCount. itemCount is: " + mPosterPaths.length);
-        return mNumItems;
+
+        if(isFavAdapter){
+            Log.d(TAG, "entering getItemCount in fav adapater. itemCount is: " + mCursor.getCount());
+            return mCursor.getCount();
+        }else{
+            Log.d(TAG, "entering getItemCount in normal adapater. itemCount is: " + mPosterPaths.length);
+            return mNumItems;
+        }
     }
 
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

@@ -1,8 +1,11 @@
 package david.com.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -70,7 +73,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private HashMap movieSelected;
     private boolean mIsFavourite;
     private String[] videoKeys;
+    private String[] reviews;
     private int nextKey = 1;
+    private SQLiteDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,17 +109,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
             loadMovieReview("reviews");
             getTrailerData("videos");
         }else{
-            //txtNoNetworkMessage.setVisibility(View.VISIBLE);
+            //TODO txtNoNetworkMessage.setVisibility(View.VISIBLE);
         }
 
         if(mIsFavourite){
             mFavStar.setImageResource(R.drawable.fav_star_on);
-            //Toast.makeText(getApplicationContext(), "removed from Favourites", Toast.LENGTH_SHORT).show();
-            mIsFavourite = false;
+            //mIsFavourite = false;
         }else {
             mFavStar.setImageResource(R.drawable.fav_star_off);
-            //Toast.makeText(getApplicationContext(), "added to Favourites", Toast.LENGTH_SHORT).show();
-            mIsFavourite = true;
+            //mIsFavourite = true;
         }
 
         mFavStar.setOnClickListener(new View.OnClickListener() {
@@ -124,6 +127,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
         });
         moviePoster = (ImageView) findViewById(R.id.imgMoviePoster);
+
+        FavMoviesDbHelper dbHelper = new FavMoviesDbHelper(this);
+        mDb = dbHelper.getWritableDatabase();
 
         displayMovieDetails(movieSelected);
         Log.d(TAG, "exiting onCreate");
@@ -167,7 +173,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         return ((activeNetworkInfo != null) && (activeNetworkInfo.isConnected()));
     }
 
-    //TODO view & play trailers (either on youtube app or web browser)
 
     //TODO mark as favourite, tap button (star) - local movies collection that I will maintain & does not require an API request
 
@@ -193,12 +198,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     private void clickFav(View view){
         if(mIsFavourite){
-            mFavStar.setImageResource(R.drawable.fav_star_on);
-            Toast.makeText(getApplicationContext(), "added to Favourites", Toast.LENGTH_SHORT).show();
-            mIsFavourite = false;
-        }else{
             mFavStar.setImageResource(R.drawable.fav_star_off);
             Toast.makeText(getApplicationContext(), "removed from Favourites", Toast.LENGTH_SHORT).show();
+            mIsFavourite = false;
+        }else{
+            mFavStar.setImageResource(R.drawable.fav_star_on);
+            addMovieToFav();
+            Toast.makeText(getApplicationContext(), "added to Favourites", Toast.LENGTH_SHORT).show();
             mIsFavourite = true;
         }
     }
@@ -251,7 +257,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
 
         private void getReviewData(JSONObject reviewObject){
-            String[] reviews;
+
             String[] authors;
             JSONArray jsonMovieReviews = JsonUtils.getJSONArray(reviewObject, "results");
 
@@ -321,5 +327,17 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     private int getNextKey() {
         return nextKey++;
+    }
+
+    private long addMovieToFav(){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, (String) movieSelected.get("title"));
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, (String) movieSelected.get("voteAverage"));
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, (String) movieSelected.get("releaseDate"));
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, (String) movieSelected.get("overview"));
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, videoKeys[0]);
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, reviews[0]);
+
+        return mDb.insert(FavMoviesContract.FavMovieEntry.TABLE_NAME, null, contentValues);
     }
 }
