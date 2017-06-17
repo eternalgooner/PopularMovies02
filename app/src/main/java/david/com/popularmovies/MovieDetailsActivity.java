@@ -349,7 +349,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 //    }
 
     private void addExtraTrailerViewsIfNeeded() {
-
+        Log.d(TAG, "entering addExtraTrailerViewsIfNeeded");
         listDataHeader = new ArrayList<>();
         listDataHeader.add("Trailers");
         listHash = new HashMap<>();
@@ -448,17 +448,20 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     @Override
     public Loader<String> onCreateLoader(final int id, final Bundle args) {
+        Log.d(TAG, "entering **** new  onCreateLoader *** & ID is:" + id);
         return new AsyncTaskLoader<String>(this) {
             @Override
             public String loadInBackground() {
-                String theMovieDbReviewQueryString = args.getString("theMovieDbTrailerQuery");
+                String theMovieDbReviewQueryString = args.getString("theMovieDbReviewQuery");
                 String theMovieDbTrailerQueryString = args.getString("theMovieDbTrailerQuery");
                 if(id == 60){
+                    Log.d(TAG, "60 found in loadInBackground");
                     if(theMovieDbReviewQueryString == null || TextUtils.isEmpty(theMovieDbReviewQueryString)){
                         return null;
                     }
 
                     try {
+                        Log.d(TAG, "in TRY 60");
                         URL theMovieDbReviewUrl = new URL(theMovieDbReviewQueryString);
                         return NetworkUtils.getResponseFromHttpUrl(theMovieDbReviewUrl);
                     } catch (IOException e) {
@@ -467,13 +470,15 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                         return null;
                     }
                 }else if(id == 61){
-                    if(theMovieDbReviewQueryString == null || TextUtils.isEmpty(theMovieDbReviewQueryString)){
+                    Log.d(TAG, "61 found in loadInBackground");
+                    if(theMovieDbTrailerQueryString == null || TextUtils.isEmpty(theMovieDbTrailerQueryString)){
                         return null;
                     }
 
                     try {
-                        URL theMovieDbReviewUrl = new URL(theMovieDbReviewQueryString);
-                        return NetworkUtils.getResponseFromHttpUrl(theMovieDbReviewUrl);
+                        Log.d(TAG, "in TRY 61");
+                        URL theMovieDbTrailerUrl = new URL(theMovieDbTrailerQueryString);
+                        return NetworkUtils.getResponseFromHttpUrl(theMovieDbTrailerUrl);
                     } catch (IOException e) {
                         e.printStackTrace();
                         Log.d(TAG, "exiting loadInBackground after exception");
@@ -485,7 +490,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
             @Override
             protected void onStartLoading() {
-                Log.d(TAG, "--- entering onStartLoading in Loader method ---");
+                Log.d(TAG, "--- entering onStartLoading in Loader method --- ID: " + id);
                 super.onStartLoading();
                 if(args == null){
                     return;
@@ -496,7 +501,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
-        Log.d(TAG, "entering onPostExecute");
+        Log.d(TAG, "entering onLoadFinished");
             if (data != null && !data.equals("")) {
                 Log.d(TAG, data);
                 JSONObject jsonObject = JsonUtils.getJSONObject(data);
