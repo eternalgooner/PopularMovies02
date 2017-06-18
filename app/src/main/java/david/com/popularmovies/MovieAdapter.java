@@ -109,7 +109,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public int getItemCount() {
-
         if(isFavAdapter){
             Log.d(TAG, "entering getItemCount in fav adapater. itemCount is: " + mCursor.getCount());
             return mCursor.getCount();

@@ -105,6 +105,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         TextView txtListChild = (TextView) convertView.findViewById(R.id.lblListItem);
         txtListChild.setCompoundDrawablesWithIntrinsicBounds(R.drawable.play, 0, 0, 0);
         txtListChild.setText("Trailer " + childText);
+
         return convertView;
     }
 

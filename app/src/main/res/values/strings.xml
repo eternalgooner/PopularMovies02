@@ -22,6 +22,7 @@
     <string name="dummy_text_review">\"I thought this movie was very good. I heard it wasn\'t supposed to be that good. Even though so much money was spent on this, it surprised me how good it was.\"
     </string>
     <string name="menu_favourites">Favourites</string>
+    <string name="mostPopular">mostPopular</string>
 
 
 </resources>

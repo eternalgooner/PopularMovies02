@@ -34,13 +34,13 @@ import java.util.HashMap;
 /**
  *
  * class that starts the application
- * - has inner class TheMovieDbTask
+ * - has inner anonymous inner class AsyncTaskLoader
  *
  * - display message if no network connection
  *
  * - if there is a network connection it will:
  *      - build a URL
- *      - pass the URL to AsyncTask to retrieve JSON data from themoviedb
+ *      - pass the URL to AsyncTaskLoader to retrieve JSON data from themoviedb
  *      - JSON data is then stored for each movie in a HashMap, which is then added to an ArrayList of movies
  *      - display movie posters in a grid layout
  *
@@ -50,7 +50,7 @@ import java.util.HashMap;
  * - upon poster click, new activity should show clicked movie details
  *
  * STRING LITERALS:
- * - string literals have not been put into the strings.xml file as they are not user-facing
+ * - only string literals are in log statements
  *
  * ATTRIBUTION:
  * - some code was implemented with help from Udacity Android course
@@ -73,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private boolean showingFavList = false;
     private Bundle movieBundle = new Bundle();
     private SQLiteDatabase mDb;
-    private static final int THE_MOVIE_DB_LOADER = 59;
+    private static final int THE_MOVIE_DB_MOST_POPULAR_LOADER = 58;
+    private static final int THE_MOVIE_DB_HIGHEST_RATED_LOADER = 59;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         txtNoNetworkMessage = (TextView) findViewById(R.id.message_no_network_connection);
 
         if(isNetworkAvailable()){
-            loadMovieList("mostPopular");
+            loadMovieList(getString(R.string.mostPopular));
         }else{
             txtNoNetworkMessage.setVisibility(View.VISIBLE);
         }
@@ -113,9 +114,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void showMovies(){
         Log.d(TAG, "entering showMovies");
-        //mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
-        //gridLayoutManager = new GridLayoutManager(this, 3);
-        //mRecyclerView.setLayoutManager(gridLayoutManager);
         mMovieAdapter = new MovieAdapter(posterPaths, NUM_LIST_ITEMS, this);
         Log.d(TAG, "***** setting adapter *****");
         mRecyclerView.setAdapter(mMovieAdapter);
@@ -123,24 +121,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private void loadMovieList(String sortType) {
-        Log.d(TAG, "entering loadMovieList");
-        URL myUrl = NetworkUtils.buildUrl(sortType, getApplicationContext(), "0");
-        //TODO remove once ATL working new TheMovieDbTask().execute(myUrl);
+        Log.d(TAG, "entering loadMovieList for " + sortType);
+        URL myUrl = NetworkUtils.buildUrl(sortType, getApplicationContext(), "0");      //TODO "0" needs to be changed to get the ID of the movie, used for getting reviews & trailers for movie
 
         Bundle queryBundle = new Bundle();
-        queryBundle.putString("theMovieDbQuery", myUrl.toString());
+        queryBundle.putString("theMovieDb" + sortType + "Query", myUrl.toString());
 
         LoaderManager loaderManager = getSupportLoaderManager();
-        Loader<String> theMovieDbLoader = loaderManager.getLoader(THE_MOVIE_DB_LOADER);
+        //Loader<String> theMovieDbLoader = loaderManager.getLoader(THE_MOVIE_DB_LOADER);
 
-        loaderManager.initLoader(THE_MOVIE_DB_LOADER, queryBundle, this).forceLoad();
-
-//
-//        if(theMovieDbLoader == null){
-//            loaderManager.initLoader(THE_MOVIE_DB_LOADER, queryBundle, this);
-//        }else{
-//            loaderManager.restartLoader(THE_MOVIE_DB_LOADER, queryBundle, this);
-//        }
+        if(sortType.equals("mostPopular")){
+            movieList = new ArrayList<>();
+            loaderManager.initLoader(THE_MOVIE_DB_MOST_POPULAR_LOADER, queryBundle, this).forceLoad();
+        }else if(sortType.equals("highestRated")){
+            movieList = new ArrayList<>();
+            loaderManager.initLoader(THE_MOVIE_DB_HIGHEST_RATED_LOADER, queryBundle, this).forceLoad();
+        }
         Log.d(TAG, "exiting loadMovieList");
     }
 
@@ -207,36 +203,102 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
 
-    //TODO new loader task methods
     @Override
-    public Loader<String> onCreateLoader(int id, final Bundle args) {
+    public Loader<String> onCreateLoader(final int id, final Bundle args) {
         Log.d(TAG, "--- entering onCreateLoader in Loader method ---");
         return new AsyncTaskLoader<String>(this) {
             @Override
             public String loadInBackground() {
                 Log.d(TAG, "--- entering loadInBackground in Loader method ---");
-                String theMovieDbQueryString = args.getString("theMovieDbQuery");
-                if(theMovieDbQueryString == null || TextUtils.isEmpty(theMovieDbQueryString)){
+                String theMovieDbMostPopularQueryString = args.getString("theMovieDbmostPopularQuery");
+                String theMovieDbHighestRatedQueryString = args.getString("theMovieDbhighestRatedQuery");
+
+                if(id == THE_MOVIE_DB_MOST_POPULAR_LOADER){
+                    return processMostPopularInBackground(theMovieDbMostPopularQueryString);
+                }else{
+                    return processHighestRatedInBackground(theMovieDbHighestRatedQueryString);
+                }
+            }
+
+            private String processHighestRatedInBackground(String queryString) {
+                Log.d(TAG, "ATL --- entering processHighestRatedInBackground in Loader method ---");
+                if(queryString == null || TextUtils.isEmpty(queryString)){
+                    Log.d(TAG, "++ theMovieDbQueryString is null or empty & will return null ++");
                     return null;
                 }
                 try {
-                    URL theMovieDbUrl = new URL(theMovieDbQueryString);
-                    return NetworkUtils.getResponseFromHttpUrl(theMovieDbUrl);
+                    URL theMovieDbUrl = new URL(queryString);
+                    String stringResponseFromRequest = NetworkUtils.getResponseFromHttpUrl(theMovieDbUrl);
+                    getAllPosterPathsAndMovieDataFromJson(stringResponseFromRequest);
+                    return stringResponseFromRequest;
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Log.d(TAG, "exiting onCreateLoader after exception");
+                    Log.e(TAG, "exiting onCreateLoader after exception");
                     return null;
                 }
             }
 
+            private String processMostPopularInBackground(String queryString) {
+                Log.d(TAG, "ATL --- entering processMostPopularInBackground in Loader method ---");
+                if(queryString == null || TextUtils.isEmpty(queryString)){
+                    Log.d(TAG, "ATL++ theMovieDbQueryString is null or empty & will return null ++");
+                    return null;
+                }
+                try {
+                    URL theMovieDbUrl = new URL(queryString);
+                    String stringResponseFromRequest = NetworkUtils.getResponseFromHttpUrl(theMovieDbUrl);
+                    getAllPosterPathsAndMovieDataFromJson(stringResponseFromRequest);
+                    return stringResponseFromRequest;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "ATL exiting onCreateLoader after exception");
+                    return null;
+                }
+            }
+
+            private void getAllPosterPathsAndMovieDataFromJson(String stringResponseFromRequest) {
+                Log.d(TAG, " £££££££££   entering getAllPosterPathsAndMovieDataFromJson ££££££££");
+                posterPaths = new String[20];
+                if (stringResponseFromRequest != null && !stringResponseFromRequest.equals("")) {
+                    Log.d(TAG, stringResponseFromRequest);
+                    JSONObject jsonObject = JsonUtils.getJSONObject(stringResponseFromRequest);
+                    JSONArray jsonMoviesArray = JsonUtils.getJSONArray(jsonObject, "results");
+                    String[] moviesResult = new String[jsonMoviesArray.length()];
+                    int next = 0;
+                    for(String movie : moviesResult){
+                        JSONObject nextMovie = JsonUtils.getJSONObject(jsonMoviesArray, next);
+                        posterPaths[next] = JsonUtils.getString(nextMovie, "poster_path");
+                        Log.d(TAG, posterPaths[next]);
+                        posterPaths[next] = "https://image.tmdb.org/t/p/w500/" + posterPaths[next];     //other poster sizes are w92, w154, w185, w342, w500, w780 or original
+                        getAllMovieData(nextMovie);
+                        ++next;
+                    }
+                    Log.d(TAG, "exiting onLoadFinished");
+                } else {
+                    Log.e(TAG, "empty data back from themoviedb api call");
+                }
+            }
+
+            private void getAllMovieData(JSONObject clickedMovie) {
+                Log.d(TAG, "ATL entering getAllMovieData");
+                HashMap movieMap = new HashMap();
+                movieMap.put("title", JsonUtils.getString(clickedMovie, "original_title"));
+                movieMap.put("overview", JsonUtils.getString(clickedMovie, "overview"));
+                movieMap.put("releaseDate", JsonUtils.getString(clickedMovie, "release_date"));
+                movieMap.put("posterPath", JsonUtils.getString(clickedMovie, "poster_path"));
+                movieMap.put("voteAverage", JsonUtils.getString(clickedMovie, "vote_average"));
+                movieMap.put("id", JsonUtils.getString(clickedMovie, "id"));
+                movieList.add(movieMap);
+                Log.d(TAG, "ATL exiting getAllMovieData");
+            }
+
             @Override
             protected void onStartLoading() {
-                Log.d(TAG, "--- entering onStartLoading in Loader method ---");
+                Log.d(TAG, "ATL --- entering onStartLoading in Loader method ---");
                 super.onStartLoading();
                 if(args == null){
                     return;
                 }
-                //movieList = new ArrayList<>();
             }
         };
     }
@@ -244,39 +306,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
         Log.d(TAG, "entering onLoadFinished");
-        posterPaths = new String[20];
-        if (data != null && !data.equals("")) {
-            Log.d(TAG, data);
-            JSONObject jsonObject = JsonUtils.getJSONObject(data);
-            JSONArray jsonMoviesArray = JsonUtils.getJSONArray(jsonObject, "results");
-            String[] moviesResult = new String[jsonMoviesArray.length()];
-            int next = 0;
-            for(String movie : moviesResult){
-                JSONObject nextMovie = JsonUtils.getJSONObject(jsonMoviesArray, next);
-                posterPaths[next] = JsonUtils.getString(nextMovie, "poster_path");
-                Log.d(TAG, posterPaths[next]);
-                posterPaths[next] = "https://image.tmdb.org/t/p/w500/" + posterPaths[next];     //other poster sizes are w92, w154, w185, w342, w500, w780 or original
-                getAllMovieData(nextMovie);
-                ++next;
-            }
             showMovies();
-            Log.d(TAG, "exiting onLoadFinished");
-        } else {
-            Log.d(TAG, "empty data back from themoviedb api call");
-        }
-    }
-
-    private void getAllMovieData(JSONObject clickedMovie) {
-        Log.d(TAG, "entering getAllMovieData");
-        HashMap movieMap = new HashMap();
-        movieMap.put("title", JsonUtils.getString(clickedMovie, "original_title"));
-        movieMap.put("overview", JsonUtils.getString(clickedMovie, "overview"));
-        movieMap.put("releaseDate", JsonUtils.getString(clickedMovie, "release_date"));
-        movieMap.put("posterPath", JsonUtils.getString(clickedMovie, "poster_path"));
-        movieMap.put("voteAverage", JsonUtils.getString(clickedMovie, "vote_average"));
-        movieMap.put("id", JsonUtils.getString(clickedMovie, "id"));
-        movieList.add(movieMap);
-        Log.d(TAG, "exiting getAllMovieData");
     }
 
     @Override
@@ -284,68 +314,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     }
 
-//    public class TheMovieDbTask extends AsyncTask<URL, Void, String> {
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            //movieList = new ArrayList<>();
-//        }
-//
-//        @Override
-//        protected String doInBackground(URL... params) {
-//            Log.d(TAG, "entering doInBackground");
-//            URL requestPopularMoviesUrl = params[0];
-//            String theMovieDbResult = null;
-//            try {
-//                theMovieDbResult = NetworkUtils.getResponseFromHttpUrl(requestPopularMoviesUrl);
-//                Log.d(TAG, "exiting doInBackground");
-//                return theMovieDbResult;
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                Log.d(TAG, "exiting doInBackground after exception");
-//                return null;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String theMovieDbSearchResults) {
-//            Log.d(TAG, "entering onPostExecute");
-//            posterPaths = new String[20];
-//            if (theMovieDbSearchResults != null && !theMovieDbSearchResults.equals("")) {
-//                Log.d(TAG, theMovieDbSearchResults);
-//                JSONObject jsonObject = JsonUtils.getJSONObject(theMovieDbSearchResults);
-//                JSONArray jsonMoviesArray = JsonUtils.getJSONArray(jsonObject, "results");
-//                String[] moviesResult = new String[jsonMoviesArray.length()];
-//                int next = 0;
-//                for(String movie : moviesResult){
-//                    JSONObject nextMovie = JsonUtils.getJSONObject(jsonMoviesArray, next);
-//                    posterPaths[next] = JsonUtils.getString(nextMovie, "poster_path");
-//                    Log.d(TAG, posterPaths[next]);
-//                    posterPaths[next] = "https://image.tmdb.org/t/p/w500/" + posterPaths[next];     //other poster sizes are w92, w154, w185, w342, w500, w780 or original
-//                    getAllMovieData(nextMovie);
-//                    ++next;
-//                }
-//                showMovies();
-//                Log.d(TAG, "exiting onPostExecute");
-//            } else {
-//                Log.d(TAG, "empty data back from themoviedb api call");
-//            }
-//        }
-//
-//        private void getAllMovieData(JSONObject clickedMovie) {
-//            Log.d(TAG, "entering getAllMovieData");
-//            HashMap movieMap = new HashMap();
-//            movieMap.put("title", JsonUtils.getString(clickedMovie, "original_title"));
-//            movieMap.put("overview", JsonUtils.getString(clickedMovie, "overview"));
-//            movieMap.put("releaseDate", JsonUtils.getString(clickedMovie, "release_date"));
-//            movieMap.put("posterPath", JsonUtils.getString(clickedMovie, "poster_path"));
-//            movieMap.put("voteAverage", JsonUtils.getString(clickedMovie, "vote_average"));
-//            movieMap.put("id", JsonUtils.getString(clickedMovie, "id"));
-//            movieList.add(movieMap);
-//            Log.d(TAG, "exiting getAllMovieData");
-//        }
-//    }
     private Cursor getAllMovies(){
         return mDb.query(FavMoviesContract.FavMovieEntry.TABLE_NAME,
                 null,

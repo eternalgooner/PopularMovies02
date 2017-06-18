@@ -81,7 +81,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private boolean mIsFavourite;
     private String[] videoKeys;
     private String[] reviews;
-    private int nextKey = 1;
     private SQLiteDatabase mDb;
 
     private ExpandableListView listTrailerView;
@@ -107,27 +106,12 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         userRating = (TextView) findViewById(R.id.txtMovieUserRating);
         releaseDate = (TextView) findViewById(R.id.txtMovieReleaseDate);
         movieSummary = (TextView) findViewById(R.id.txtMovieSummary);
-        //txtMoviePlay = (TextView) findViewById(R.id.txtMoviePlay);
-//        txtMoviePlay.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                playTrailer(videoKeys[0]);
-//            }
-//        });
+
         mFavStar = (ImageButton) findViewById(R.id.imgFavStar);
         linearLayout = (LinearLayout) findViewById(R.id.ll_play_trailer);
         expandableTextView = (ExpandableTextView) findViewById(R.id.expandable_text_view);
 
         listTrailerView = (ExpandableListView) findViewById(R.id.expLV);
-
-        //prepare data
-
-
-//        listDataHeader = new ArrayList<>();
-//        listDataHeader.add("Trailers");
-//        listHash = new HashMap<>();
-//        listTrailerAdapter = new ExpandableListAdapter(this, listDataHeader, listHash);
-//        listTrailerView.setAdapter(listTrailerAdapter);
 
         Bundle bundle = this.getIntent().getExtras();
         movieSelected = (HashMap) bundle.getSerializable("selectedMovie");
@@ -202,10 +186,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         queryBundle.putString("theMovieDbReviewQuery", myUrl.toString());
 
         LoaderManager loaderManager = getSupportLoaderManager();
-        Loader<String> theMovieDbLoader = loaderManager.getLoader(THE_MOVIE_DB_REVIEW_LOADER);
+        //Loader<String> theMovieDbLoader = loaderManager.getLoader(THE_MOVIE_DB_REVIEW_LOADER);
 
         loaderManager.initLoader(THE_MOVIE_DB_REVIEW_LOADER, queryBundle, this).forceLoad();
-        //new MovieDetailsActivity.TheMovieDbTask().execute(myUrl);
     }
 
     private boolean isNetworkAvailable(){
@@ -215,8 +198,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         Log.d(TAG, "exiting isNetworkAvailable");
         return ((activeNetworkInfo != null) && (activeNetworkInfo.isConnected()));
     }
-
-
     //TODO mark as favourite, tap button (star) - local movies collection that I will maintain & does not require an API request
 
     private void displayMovieDetails(HashMap movie) {
@@ -252,102 +233,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
-//    public class TheMovieDbTask extends AsyncTask<URL, Void, String> {
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//        }
-//
-//        @Override
-//        protected String doInBackground(URL... params) {
-//            Log.d(TAG, "entering doInBackground");
-//            URL requestMovieReviewUrl = params[0];
-//            String theMovieDbResult = null;
-//            try {
-//                theMovieDbResult = NetworkUtils.getResponseFromHttpUrl(requestMovieReviewUrl);
-//                Log.d(TAG, "exiting doInBackground");
-//                return theMovieDbResult;
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                Log.d(TAG, "exiting doInBackground after exception");
-//                return null;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String theMovieDbSearchResults) {
-//            Log.d(TAG, "entering onPostExecute");
-//            if (theMovieDbSearchResults != null && !theMovieDbSearchResults.equals("")) {
-//                Log.d(TAG, theMovieDbSearchResults);
-//                JSONObject jsonObject = JsonUtils.getJSONObject(theMovieDbSearchResults);
-//
-//                Log.d(TAG, "JSON size is : " + jsonObject.length());
-//                switch (jsonObject.length()) {
-//                    case 2:                             //video api result size
-//                        getVideoData(jsonObject);
-//                        break;
-//                    case 5:                             //review api result size
-//                        getReviewData(jsonObject);
-//                        break;
-//                    default:
-//                        Log.e(TAG, "no match found in onPostExecute() switch, looking for either getVideoData() or getReviewData()");
-//                        break;
-//                }
-//            } else {
-//                Log.d(TAG, "empty data back from themoviedb api call");
-//            }
-//        }
-//
-//        private void getReviewData(JSONObject reviewObject){
-//
-//            String[] authors;
-//            JSONArray jsonMovieReviews = JsonUtils.getJSONArray(reviewObject, "results");
-//
-//            reviews = new String[jsonMovieReviews.length()];
-//            authors = new String[jsonMovieReviews.length()];
-//
-//            int nextReview = 0;
-//            for(String review : reviews){
-//                JSONObject reviewDetails = JsonUtils.getJSONObject(jsonMovieReviews, nextReview);
-//                reviews[nextReview] = JsonUtils.getString(reviewDetails, "content");
-//                authors[nextReview] = JsonUtils.getString(reviewDetails, "author");
-//                ++nextReview;
-//            }
-//
-//            for(int i = 0; i < reviews.length; ++i){
-//                expandableTextView.setText(expandableTextView.getText() + authors[i] + ":" + "\n\"" + reviews[i] + "\"\n\n          -----------------------------------------------\n\n");
-//            }
-//        }
-//
-//        private void getVideoData(JSONObject videoObject){
-//            JSONArray jsonMovieVideos = JsonUtils.getJSONArray(videoObject, "results");
-//
-//            videoKeys = new String[jsonMovieVideos.length()];
-//            trailerList = new ArrayList<>();
-//
-//            int nextTrailer = 0;
-//            for(String trailer : videoKeys){
-//                JSONObject reviewDetails = JsonUtils.getJSONObject(jsonMovieVideos, nextTrailer);
-//                videoKeys[nextTrailer] = JsonUtils.getString(reviewDetails, "key");
-//
-//                trailerList.add("Trailer " + nextTrailer);
-//
-//                ++nextTrailer;
-//            }
-//
-//            Log.d(TAG, "debugging trailer list ======= items are:" + Arrays.toString(trailerList.toArray()));
-//
-//
-//
-//            for(int i = 0; i < videoKeys.length; ++i){
-//                Log.d(TAG, "key is: " + videoKeys[i]);
-//            }
-//
-//            if(videoKeys.length > 1) addExtraTrailerViewsIfNeeded();
-//        }
-//    }
-
     private void addExtraTrailerViewsIfNeeded() {
         Log.d(TAG, "entering addExtraTrailerViewsIfNeeded");
         listDataHeader = new ArrayList<>();
@@ -362,6 +247,14 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         //Log.d(TAG, "xxxxxxxxxx debugging trailer list in hashmap ======= items in list is now:" + Arrays.toString(listHash.get(0).toArray()));
         listTrailerAdapter = new ExpandableListAdapter(this, listDataHeader, listHash);
         listTrailerView.setAdapter(listTrailerAdapter);
+        listTrailerView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                Log.d(TAG, "clicked trailer, position: " + childPosition + " video key is: " + videoKeys[childPosition]);
+                playTrailer(videoKeys[childPosition]);
+                return false;
+            }
+        });
         listTrailerView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
@@ -369,31 +262,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                 return false;
             }
         });
-
-//        float scale = getResources().getDisplayMetrics().density;
-//        int topPd = (int) (12 * scale + 0.5f);
-//        int leftPd = (int) (8 * scale + 0.5f);
-//
-//        for(int i = 1; i < videoKeys.length; ++i){                  //starting at 1 as have already given index 0 to TextBox displayed
-//            TextView textView = new TextView(this);
-//            textView.setText("Trailer " + (i + 1));
-//
-//            textView.setPadding(leftPd, topPd, 0, 0);
-//            textView.setTextSize(16);
-//            textView.setGravity(Gravity.CENTER);
-//            textView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    playTrailer(videoKeys[getNextKey()]);
-//                }
-//            });
-//
-//            textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.play, 0, 0, 0);
-//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//            //params.gravity = Gravity.BOTTOM;
-//            textView.setLayoutParams(params);
-//            linearLayout.addView(textView);
-//        }
     }
 
     private void setListViewHeight(ExpandableListView parent, int groupPosition) {
@@ -430,10 +298,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         listTrailerView.requestLayout();
     }
 
-    private int getNextKey() {
-        return nextKey++;
-    }
-
     private long addMovieToFav(){
         ContentValues contentValues = new ContentValues();
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, (String) movieSelected.get("title"));
@@ -455,37 +319,74 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                 String theMovieDbReviewQueryString = args.getString("theMovieDbReviewQuery");
                 String theMovieDbTrailerQueryString = args.getString("theMovieDbTrailerQuery");
                 if(id == 60){
-                    Log.d(TAG, "60 found in loadInBackground");
-                    if(theMovieDbReviewQueryString == null || TextUtils.isEmpty(theMovieDbReviewQueryString)){
-                        return null;
-                    }
+                     return processReviewQueryData(theMovieDbReviewQueryString);
 
-                    try {
-                        Log.d(TAG, "in TRY 60");
-                        URL theMovieDbReviewUrl = new URL(theMovieDbReviewQueryString);
-                        return NetworkUtils.getResponseFromHttpUrl(theMovieDbReviewUrl);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Log.d(TAG, "exiting loadInBackground after exception");
-                        return null;
-                    }
+//                    Log.d(TAG, "60 found in loadInBackground");
+//                    if(theMovieDbReviewQueryString == null || TextUtils.isEmpty(theMovieDbReviewQueryString)){
+//                        return null;
+//                    }
+//
+//                    try {
+//                        Log.d(TAG, "in TRY 60");
+//                        URL theMovieDbReviewUrl = new URL(theMovieDbReviewQueryString);
+//                        return NetworkUtils.getResponseFromHttpUrl(theMovieDbReviewUrl);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        Log.d(TAG, "exiting loadInBackground after exception");
+//                        return null;
+//                    }
                 }else if(id == 61){
-                    Log.d(TAG, "61 found in loadInBackground");
-                    if(theMovieDbTrailerQueryString == null || TextUtils.isEmpty(theMovieDbTrailerQueryString)){
-                        return null;
-                    }
-
-                    try {
-                        Log.d(TAG, "in TRY 61");
-                        URL theMovieDbTrailerUrl = new URL(theMovieDbTrailerQueryString);
-                        return NetworkUtils.getResponseFromHttpUrl(theMovieDbTrailerUrl);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Log.d(TAG, "exiting loadInBackground after exception");
-                        return null;
-                    }
+                    return processTrailerQueryData(theMovieDbTrailerQueryString);
+//                    Log.d(TAG, "61 found in loadInBackground");
+//                    if(theMovieDbTrailerQueryString == null || TextUtils.isEmpty(theMovieDbTrailerQueryString)){
+//                        return null;
+//                    }
+//
+//                    try {
+//                        Log.d(TAG, "in TRY 61");
+//                        URL theMovieDbTrailerUrl = new URL(theMovieDbTrailerQueryString);
+//                        return NetworkUtils.getResponseFromHttpUrl(theMovieDbTrailerUrl);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        Log.d(TAG, "exiting loadInBackground after exception");
+//                        return null;
+//                    }
                 }
                 return null;
+            }
+
+            private String processTrailerQueryData(String theMovieDbTrailerQueryString) {
+                Log.d(TAG, "61 found in loadInBackground");
+                if(theMovieDbTrailerQueryString == null || TextUtils.isEmpty(theMovieDbTrailerQueryString)){
+                    return null;
+                }
+
+                try {
+                    Log.d(TAG, "in TRY 61");
+                    URL theMovieDbTrailerUrl = new URL(theMovieDbTrailerQueryString);
+                    return NetworkUtils.getResponseFromHttpUrl(theMovieDbTrailerUrl);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "exiting loadInBackground after exception");
+                    return null;
+                }
+            }
+
+            private String processReviewQueryData(String reviewData) {
+                Log.d(TAG, "60 found in loadInBackground");
+                if(reviewData == null || TextUtils.isEmpty(reviewData)){
+                    return null;
+                }
+
+                try {
+                    Log.d(TAG, "in TRY 60");
+                    URL theMovieDbReviewUrl = new URL(reviewData);
+                    return NetworkUtils.getResponseFromHttpUrl(theMovieDbReviewUrl);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "exiting loadInBackground after exception");
+                    return null;
+                }
             }
 
             @Override
@@ -519,7 +420,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                         break;
                 }
             } else {
-                Log.d(TAG, "empty data back from themoviedb api call");
+                Log.e(TAG, "empty data back from themoviedb api call");
             }
     }
 

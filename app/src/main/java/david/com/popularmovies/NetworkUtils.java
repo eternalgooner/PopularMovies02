@@ -33,6 +33,7 @@ import java.util.Scanner;
 public class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
+    //TODO get rid of static context
     private static Context context;
     private static String base_url_popular;
     private static String base_url_top_rated;
@@ -54,7 +55,7 @@ public class NetworkUtils {
     }
 
     public static URL buildUrl(String sortType, Context context, String id){
-        Log.d(TAG, "entering buildUrl");
+        Log.d(TAG, "NU entering buildUrl");
         NetworkUtils.context = context;
         initData();
         String sortParam = "";
@@ -86,6 +87,7 @@ public class NetworkUtils {
     }
 
     public static String getResponseFromHttpUrl(URL url) throws IOException {
+       Log.d(TAG, "NU entering getResponseFromHttpUrl");
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
         try {
