@@ -298,16 +298,23 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         listTrailerView.requestLayout();
     }
 
-    private long addMovieToFav(){
+    private void addMovieToFav(){
         ContentValues contentValues = new ContentValues();
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, (String) movieSelected.get("title"));
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, (String) movieSelected.get("voteAverage"));
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, (String) movieSelected.get("releaseDate"));
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, (String) movieSelected.get("overview"));
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, videoKeys[0]);
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, reviews[0]);
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, reviews[0]);                   //TODO defect, reviews[] can be null if no reviews, need check...
 
-        return mDb.insert(FavMoviesContract.FavMovieEntry.TABLE_NAME, null, contentValues);
+        Uri uri = getContentResolver().insert(FavMoviesContract.FavMovieEntry.CONTENT_URI, contentValues);
+
+        if(uri != null){
+            Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+        }
+
+        //return mDb.insert(FavMoviesContract.FavMovieEntry.TABLE_NAME, null, contentValues);
+
     }
 
     @Override

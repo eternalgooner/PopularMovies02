@@ -1,10 +1,12 @@
 package david.com.popularmovies;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -20,6 +22,8 @@ public class MovieContentProvider extends ContentProvider {
 
     public static final int FAV_MOVIES = 100;
     public static final int MOVIE_WITH_ID = 101;
+
+    public static final String TABLE_NAME = "favMovies";
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
@@ -56,7 +60,7 @@ public class MovieContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        SQLiteDatabase db = new FavMoviesDbHelper(getContext()).getWritableDatabase();
+        final SQLiteDatabase db = mFavMovieDbHelper.getWritableDatabase();
         int match = sUriMatcher.match(uri);
 
         Uri returnUri;
@@ -64,9 +68,19 @@ public class MovieContentProvider extends ContentProvider {
         switch (match){
             case FAV_MOVIES:
                 //inserting values into table
-                long id = db.insert()
+                long id = db.insert(TABLE_NAME, null, values);
+                if(id > 0){
+                    returnUri = ContentUris.withAppendedId(FavMoviesContract.FavMovieEntry.CONTENT_URI, id);
+                }else{
+                    throw new SQLException("failed to insert row into " + uri);
+                }
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        return null;
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return returnUri;
     }
 
     @Override
