@@ -315,13 +315,24 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private Cursor getAllMovies(){
-        return mDb.query(FavMoviesContract.FavMovieEntry.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
+//        return mDb.query(FavMoviesContract.FavMovieEntry.TABLE_NAME,
+//                null,
+//                null,
+//                null,
+//                null,
+//                null,
+//                null
+//        );
+        try{
+            return getContentResolver().query(FavMoviesContract.FavMovieEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
+        }catch (Exception e){
+            Log.e(TAG, "failed to async load data");
+            e.printStackTrace();
+            return null;
+        }
     }
 }
