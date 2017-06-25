@@ -154,7 +154,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
 
         if(showingFavList){
-            movieBundle.putSerializable("selectedFavMovie", movieList.get(clickedItem));
+            HashMap<String, String> favMovie = new HashMap();
+            Cursor cursor = getClickedMovieData(clickedItem);
+            favMovie = convertCursorDataToHashMapMovie(cursor);
+            movieBundle.putSerializable("selectedMovie", favMovie);
         }else{
             movieBundle.putSerializable("selectedMovie", movieList.get(clickedItem));
         }
@@ -162,6 +165,39 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         intent.putExtras(movieBundle);
         MainActivity.this.startActivity(intent);
         Log.d(TAG, "exiting onListItemClick");
+    }
+
+    private HashMap<String,String> convertCursorDataToHashMapMovie(Cursor cursor) {
+        HashMap<String, String> movie = new HashMap<>();
+//        int columnIndex = 0;
+//        while (cursor.moveToNext()){
+//            movie.put("column" + columnIndex, cursor.getColumnName(columnIndex));
+//            ++columnIndex;
+//        }
+//        cursor.close();
+        //TODO left off here. working on displaying selected fav movie details in new activity. 
+        movie.put("title", cursor.getColumnName(1));
+        movie.put("voteAverage", cursor.getColumnName(2));
+        movie.put("releaseDate", cursor.getColumnName(3));
+        movie.put("overview", cursor.getColumnName(4));
+        movie.put("trailer", cursor.getColumnName(5));
+        movie.put("review", cursor.getColumnName(6));
+        cursor.close();
+        return movie;
+    }
+
+    private Cursor getClickedMovieData(int clickedItem) {
+        try{
+            return getContentResolver().query(FavMoviesContract.FavMovieEntry.CONTENT_URI,
+                    null,
+                    "_ID=?",
+                    new String[]{clickedItem+""},
+                    null);
+        }catch (Exception e){
+            Log.e(TAG, "failed to async load data");
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
