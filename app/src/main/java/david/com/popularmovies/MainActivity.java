@@ -104,6 +104,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Log.d(TAG, "exiting onCreate");
     }
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//
+//        //re-queries for all tasks
+//        getSupportLoaderManager().restartLoader(THE_MOVIE_DB_MOST_POPULAR_LOADER, null, this); //TODO need to fix this as only working for popular movies, currently this breaks most popular
+//    }
+
     private boolean isNetworkAvailable(){
         Log.d(TAG, "entering isNetworkAvailable");
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -144,7 +152,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public void onListItemClick(int clickedItem) {
         Log.d(TAG, "entering onListItemClick");
         Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
-        movieBundle.putSerializable("selectedMovie", movieList.get(clickedItem));
+
+        if(showingFavList){
+            movieBundle.putSerializable("selectedFavMovie", movieList.get(clickedItem));
+        }else{
+            movieBundle.putSerializable("selectedMovie", movieList.get(clickedItem));
+        }
+
         intent.putExtras(movieBundle);
         MainActivity.this.startActivity(intent);
         Log.d(TAG, "exiting onListItemClick");
@@ -172,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 if(showingMostPopular || showingFavList) showHighestRated();
                 break;
             case R.id.menu_favourites:
-                showFavourites();
+                showFavourites();               //TODO shows favourites, but when clicking on fav movie, doesn't show, shows position from other list. Adapter work needed?
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -182,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         //TODO implement
         showingMostPopular = false; //TODO fix bug - need to be able to go back to either most pop or highest rated from FAV - need to change boolean
         showingFavList = true;
-        Cursor cursor = getAllMovies();
+        Cursor cursor = getAllFavMovies();
         mMovieAdapter = new MovieAdapter(this, cursor, this);
         mRecyclerView.setAdapter(mMovieAdapter);
         Toast.makeText(this, "show favs", Toast.LENGTH_SHORT).show();
@@ -314,15 +328,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     }
 
-    private Cursor getAllMovies(){
-//        return mDb.query(FavMoviesContract.FavMovieEntry.TABLE_NAME,
-//                null,
-//                null,
-//                null,
-//                null,
-//                null,
-//                null
-//        );
+    private Cursor getAllFavMovies(){
+        try{
+            return getContentResolver().query(FavMoviesContract.FavMovieEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
+        }catch (Exception e){
+            Log.e(TAG, "failed to async load data");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Cursor showSelectedFavMovie(){
         try{
             return getContentResolver().query(FavMoviesContract.FavMovieEntry.CONTENT_URI,
                     null,

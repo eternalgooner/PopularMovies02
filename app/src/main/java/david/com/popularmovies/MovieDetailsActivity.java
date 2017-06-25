@@ -299,6 +299,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void addMovieToFav(){
+        //TODO add all movie values into new movie object
         ContentValues contentValues = new ContentValues();
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, (String) movieSelected.get("title"));
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, (String) movieSelected.get("voteAverage"));

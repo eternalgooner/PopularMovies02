@@ -49,9 +49,7 @@ public class MovieContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         final SQLiteDatabase db = mFavMovieDbHelper.getReadableDatabase();
-
         int match = sUriMatcher.match(uri);
-
         Cursor retCursor;
 
         switch (match){
@@ -64,6 +62,23 @@ public class MovieContentProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
+            case MOVIE_WITH_ID:
+                //using selection & selectionArgs
+                String id = uri.getPathSegments().get(1);
+
+                //selection is the _ID column = ?, and the selection args = the row ID form the Uri
+                String mSelection = "_ID=?";
+                String[] mSelectionArgs = new String[]{id};
+
+                retCursor = db.query(TABLE_NAME,
+                        projection,
+                        mSelection,
+                        mSelectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+
             default:
                 throw new UnsupportedOperationException("Unknown Uri: " + uri);
         }
