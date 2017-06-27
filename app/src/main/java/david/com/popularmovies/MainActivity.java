@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -155,7 +156,20 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         if(showingFavList){
             HashMap<String, String> favMovie = new HashMap();
-            Cursor cursor = getClickedMovieData(clickedItem);
+            Cursor cursor = getClickedMovieData(clickedItem+1);
+
+            int counter = 0;
+            Log.e("cursor count is: ", cursor.getCount()+"");
+            while(cursor.moveToNext()){
+                Log.e("debug cursor", cursor.getString(0));
+                Log.e("debug cursor", cursor.getString(1));
+                Log.e("debug cursor", cursor.getString(2));
+                Log.e("debug cursor", cursor.getString(3));
+                Log.e("debug cursor", cursor.getString(4));
+                Log.e("debug cursor", cursor.getString(5));
+                Log.e("debug cursor", cursor.getString(6));
+                //++counter;
+            }
             favMovie = convertCursorDataToHashMapMovie(cursor);
             movieBundle.putSerializable("selectedMovie", favMovie);
         }else{
@@ -169,29 +183,28 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private HashMap<String,String> convertCursorDataToHashMapMovie(Cursor cursor) {
         HashMap<String, String> movie = new HashMap<>();
-//        int columnIndex = 0;
-//        while (cursor.moveToNext()){
-//            movie.put("column" + columnIndex, cursor.getColumnName(columnIndex));
-//            ++columnIndex;
-//        }
-//        cursor.close();
-        //TODO left off here. working on displaying selected fav movie details in new activity. 
-        movie.put("title", cursor.getColumnName(1));
-        movie.put("voteAverage", cursor.getColumnName(2));
-        movie.put("releaseDate", cursor.getColumnName(3));
-        movie.put("overview", cursor.getColumnName(4));
-        movie.put("trailer", cursor.getColumnName(5));
-        movie.put("review", cursor.getColumnName(6));
+
+        //TODO left off here. working on displaying selected fav movie details in new activity.
+        cursor.moveToFirst();
+        movie.put("title", cursor.getString(1));
+        movie.put("voteAverage", cursor.getString(2));
+        movie.put("releaseDate", cursor.getString(3));
+        movie.put("overview", cursor.getString(4));
+        movie.put("trailer", cursor.getString(5));
+        movie.put("review", cursor.getString(6));
+        //movie.put("review", cursor.getString(7));
         cursor.close();
         return movie;
     }
 
     private Cursor getClickedMovieData(int clickedItem) {
         try{
-            return getContentResolver().query(FavMoviesContract.FavMovieEntry.CONTENT_URI,
+            Uri uri = FavMoviesContract.FavMovieEntry.CONTENT_URI;
+            uri = uri.buildUpon().appendPath(clickedItem+"").build();
+            return getContentResolver().query(uri,
                     null,
-                    "_ID=?",
-                    new String[]{clickedItem+""},
+                    null,
+                    null,
                     null);
         }catch (Exception e){
             Log.e(TAG, "failed to async load data");

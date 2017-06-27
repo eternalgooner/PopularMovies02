@@ -75,13 +75,13 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private ImageButton mFavStar;
     protected TextView movieSummary;
     private LinearLayout linearLayout;
-    //private TextView txtMoviePlay;
     private ExpandableTextView expandableTextView;
     private HashMap movieSelected;
-    private boolean mIsFavourite;
+    private boolean mIsFavourite = true;        //TODO bug - need to perform check in onCreate to see if movie coming in is FAV or not
     private String[] videoKeys;
     private String[] reviews;
     private SQLiteDatabase mDb;
+    private Bundle bundle;
 
     private ExpandableListView listTrailerView;
     private ExpandableListAdapter listTrailerAdapter;
@@ -113,14 +113,17 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
         listTrailerView = (ExpandableListView) findViewById(R.id.expLV);
 
-        Bundle bundle = this.getIntent().getExtras();
+        bundle = this.getIntent().getExtras();
         movieSelected = (HashMap) bundle.getSerializable("selectedMovie");
 
-        if(isNetworkAvailable()){
+        if(isNetworkAvailable() && !mIsFavourite){
+            Log.d("TAG --- +++", "newtowrk is available & movie is not a FAV ");
             loadMovieReview("reviews");
             getTrailerData("videos");
         }else{
             //TODO txtNoNetworkMessage.setVisibility(View.VISIBLE);
+            Log.d("TAG --- +++", "MOVIE IS FAV");
+            loadLocalMovieData();
         }
 
         if(mIsFavourite){
@@ -142,9 +145,15 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         FavMoviesDbHelper dbHelper = new FavMoviesDbHelper(this);
         mDb = dbHelper.getWritableDatabase();
 
+        //Cursor cursor = mDb.query(FavMoviesContract.FavMovieEntry.TABLE_NAME, null, null, null, null, null, null);
+//        Log.e("get DB column count", cursor.getColumnCount()+"");
+//        Log.e("get DB count", cursor.getCount()+""); TODO remove debugging
+
         displayMovieDetails(movieSelected);
         Log.d(TAG, "exiting onCreate");
     }
+
+
 
     private void playTrailer(String trailerId) {
         Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + trailerId));
@@ -191,6 +200,13 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         loaderManager.initLoader(THE_MOVIE_DB_REVIEW_LOADER, queryBundle, this).forceLoad();
     }
 
+    private void loadLocalMovieData() {
+        Log.d("TAG --- +++", "in loadLocalMovieData() ");
+        String review = (String) movieSelected.get("review");
+        Log.d("TAG --- +++", "review data is: " + review);
+        expandableTextView.setText(review);
+    }
+
     private boolean isNetworkAvailable(){
         Log.d(TAG, "entering isNetworkAvailable");
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -207,6 +223,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         String posterPrefix = getString(R.string.url_poster_prefix);
         movieTitle.setText((String)movie.get("title"));
         movieSummary.setText((String)movie.get("overview"));
+        //TODO add review here - use movie.get("review");
         userRating.setText((String)movie.get("voteAverage") + "/10");
         releaseDate.setText(year);
         Picasso.with(getApplicationContext()).load(posterPrefix + (String) movie.get("posterPath")).into(moviePoster);
@@ -328,37 +345,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                 String theMovieDbTrailerQueryString = args.getString("theMovieDbTrailerQuery");
                 if(id == 60){
                      return processReviewQueryData(theMovieDbReviewQueryString);
-
-//                    Log.d(TAG, "60 found in loadInBackground");
-//                    if(theMovieDbReviewQueryString == null || TextUtils.isEmpty(theMovieDbReviewQueryString)){
-//                        return null;
-//                    }
-//
-//                    try {
-//                        Log.d(TAG, "in TRY 60");
-//                        URL theMovieDbReviewUrl = new URL(theMovieDbReviewQueryString);
-//                        return NetworkUtils.getResponseFromHttpUrl(theMovieDbReviewUrl);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                        Log.d(TAG, "exiting loadInBackground after exception");
-//                        return null;
-//                    }
                 }else if(id == 61){
                     return processTrailerQueryData(theMovieDbTrailerQueryString);
-//                    Log.d(TAG, "61 found in loadInBackground");
-//                    if(theMovieDbTrailerQueryString == null || TextUtils.isEmpty(theMovieDbTrailerQueryString)){
-//                        return null;
-//                    }
-//
-//                    try {
-//                        Log.d(TAG, "in TRY 61");
-//                        URL theMovieDbTrailerUrl = new URL(theMovieDbTrailerQueryString);
-//                        return NetworkUtils.getResponseFromHttpUrl(theMovieDbTrailerUrl);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                        Log.d(TAG, "exiting loadInBackground after exception");
-//                        return null;
-//                    }
                 }
                 return null;
             }
@@ -473,11 +461,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         Log.d(TAG, "debugging trailer list ======= items are:" + Arrays.toString(trailerList.toArray()));
 
 
-
         for(int i = 0; i < videoKeys.length; ++i){
             Log.d(TAG, "key is: " + videoKeys[i]);
         }
-
         if(videoKeys.length > 1) addExtraTrailerViewsIfNeeded();
     }
 

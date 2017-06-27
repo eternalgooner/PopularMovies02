@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by David on 20-Jun-17.
@@ -54,6 +55,7 @@ public class MovieContentProvider extends ContentProvider {
 
         switch (match){
             case FAV_MOVIES:
+                Log.d("TAG", " match found for FAV_MOVIES in DB query method");
                 retCursor = db.query(TABLE_NAME,
                         projection,
                         selection,
@@ -63,11 +65,13 @@ public class MovieContentProvider extends ContentProvider {
                         sortOrder);
                 break;
             case MOVIE_WITH_ID:
+                Log.d("TAG", " match found for MOVIE_WITH_ID in DB query method");
                 //using selection & selectionArgs
-                String id = uri.getPathSegments().get(1);
+                //String id = uri.getPathSegments().get(1);
+                String id = uri.getLastPathSegment();
 
                 //selection is the _ID column = ?, and the selection args = the row ID form the Uri
-                String mSelection = "_ID=?";
+                String mSelection = "_id=?";
                 String[] mSelectionArgs = new String[]{id};
 
                 retCursor = db.query(TABLE_NAME,
