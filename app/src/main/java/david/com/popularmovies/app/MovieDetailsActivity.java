@@ -79,7 +79,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private LinearLayout linearLayout;
     private ExpandableTextView expandableTextView;
     private HashMap movieSelected;
-    private boolean mIsFavourite;        //TODO bug - need to perform check in onCreate to see if movie coming in is FAV or not
+    private boolean mIsFavourite;        //TODO bug - need to perform check in onCreate to see if movie coming in is FAV or not - need to go to DB with ID prob (add movie ID attr in DB)
     private String[] videoKeys;
     private String[] reviews;
     private SQLiteDatabase mDb;
@@ -144,14 +144,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             }
         });
         moviePoster = (ImageView) findViewById(R.id.imgMoviePoster);
-
         FavMoviesDbHelper dbHelper = new FavMoviesDbHelper(this);
         mDb = dbHelper.getWritableDatabase();
-
-        //Cursor cursor = mDb.query(FavMoviesContract.FavMovieEntry.TABLE_NAME, null, null, null, null, null, null);
-//        Log.e("get DB column count", cursor.getColumnCount()+"");
-//        Log.e("get DB count", cursor.getCount()+""); TODO remove debugging
-
         displayMovieDetails(movieSelected);
         Log.d(TAG, "exiting onCreate");
     }
@@ -238,7 +232,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         Log.d(TAG, "exiting isNetworkAvailable");
         return ((activeNetworkInfo != null) && (activeNetworkInfo.isConnected()));
     }
-    //TODO mark as favourite, tap button (star) - local movies collection that I will maintain & does not require an API request
 
     private void displayMovieDetails(HashMap movie) {
         Log.d(TAG, "entering displayMovieDetails");
@@ -247,7 +240,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         String posterPrefix = getString(R.string.url_poster_prefix);
         movieTitle.setText((String)movie.get("title"));
         movieSummary.setText((String)movie.get("overview"));
-        //TODO add review here - use movie.get("review");
         userRating.setText((String)movie.get("voteAverage") + "/10");
         releaseDate.setText(year);
         if(!mIsFavourite){
