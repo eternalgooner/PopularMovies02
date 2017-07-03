@@ -96,13 +96,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
             Log.d(TAG, "all details retrieved from DB are: " + title + " : " + rating + " : " + year + " : " + summary + " : " + trailer + " : " + review);
 
+            holder.mFavImageView.setImageResource(R.mipmap.movie_projector);
             holder.mTextView.setText(title);
-            if(position % 2 == 0){
+            //if(position % 2 == 0){
                 holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
-            }else{
-                holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
-                holder.mTextView.setTextColor(Color.WHITE);
-            }
+            //}else{
+             //   holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+             //   holder.mTextView.setTextColor(Color.WHITE);
+            //}
         }
 
         Log.d(TAG, "exiting onBindViewHolder");
@@ -122,8 +123,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public ImageView mImageView;
-        public FrameLayout frameLayout;
 
+        public ImageView mFavImageView;
         public TextView mTextView;
 
         public MovieAdapterViewHolder(View itemView) {
@@ -133,7 +134,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             if(!isFavAdapter){
                 mImageView = (ImageView) itemView.findViewById(R.id.item_imageView);
             }else if(isFavAdapter){
-                mTextView = (TextView) itemView.findViewById(R.id.fav_layout_item);
+                mFavImageView = (ImageView) itemView.findViewById(R.id.fav_layout_img);
+                mTextView = (TextView) itemView.findViewById(R.id.fav_layout_txt);
             }
 
             itemView.setOnClickListener(this);

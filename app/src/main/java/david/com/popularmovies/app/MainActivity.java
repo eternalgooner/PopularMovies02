@@ -166,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             HashMap<String, String> favMovie = new HashMap();
             Cursor cursor = getClickedMovieData(clickedItem+1);
 
-            int counter = 0;
             Log.e("cursor count is: ", cursor.getCount()+"");
             while(cursor.moveToNext()){
                 Log.e("debug cursor", cursor.getString(0));
@@ -176,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 Log.e("debug cursor", cursor.getString(4));
                 Log.e("debug cursor", cursor.getString(5));
                 Log.e("debug cursor", cursor.getString(6));
-                //++counter;
             }
             favMovie = convertCursorDataToHashMapMovie(cursor);
             movieBundle.putSerializable("selectedMovie", favMovie);
@@ -194,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private HashMap<String,String> convertCursorDataToHashMapMovie(Cursor cursor) {
         HashMap<String, String> movie = new HashMap<>();
 
-        //TODO left off here. working on displaying selected fav movie details in new activity.
         cursor.moveToFirst();
         movie.put("title", cursor.getString(1));
         movie.put("voteAverage", cursor.getString(2));
@@ -202,7 +199,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         movie.put("overview", cursor.getString(4));
         movie.put("trailer", cursor.getString(5));
         movie.put("review", cursor.getString(6));
-        //movie.put("review", cursor.getString(7));
         cursor.close();
         return movie;
     }
@@ -252,10 +248,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private void showFavourites() {
-        //TODO implement
-        //showingMostPopular = false; //TODO fix bug - need to be able to go back to either most pop or highest rated from FAV - need to change boolean
-        //showingFavList = true;
         mMenuState = MenuState.MENU_FAV;
+        txtNoNetworkMessage.setVisibility(View.INVISIBLE);
         Cursor cursor = getAllFavMovies();
         mMovieAdapter = new MovieAdapter(this, cursor, this);
         mRecyclerView.setAdapter(mMovieAdapter);
@@ -264,18 +258,24 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void showHighestRated() {
         Log.d(TAG, "entering showHighestRated");
-        //showingMostPopular = false;
-        //showingFavList = false;
         mMenuState = MenuState.MENU_HIGHEST_RATED;
-        loadMovieList("highestRated");
+        if(isNetworkAvailable()){
+            loadMovieList(getString(R.string.highestRated));
+        }else{
+            txtNoNetworkMessage.setVisibility(View.VISIBLE);
+            mRecyclerView.setAdapter(null);
+        }
     }
 
     private void showMostPopular() {
         Log.d(TAG, "entering showMostPopular");
-        //showingMostPopular = true;
-        //showingFavList = false;
         mMenuState = MenuState.MENU_MOST_POPULAR;
-        loadMovieList("mostPopular");
+        if(isNetworkAvailable()){
+            loadMovieList(getString(R.string.mostPopular));
+        }else{
+            txtNoNetworkMessage.setVisibility(View.VISIBLE);
+            mRecyclerView.setAdapter(null);
+        }
     }
 
 

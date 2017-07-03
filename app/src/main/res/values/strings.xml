@@ -23,6 +23,7 @@
     </string>
     <string name="menu_favourites">Favourites</string>
     <string name="mostPopular">mostPopular</string>
+    <string name="highestRated">highestRated</string>
 
 
 </resources>

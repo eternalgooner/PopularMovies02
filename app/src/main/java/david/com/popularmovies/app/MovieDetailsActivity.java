@@ -250,7 +250,13 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         //TODO add review here - use movie.get("review");
         userRating.setText((String)movie.get("voteAverage") + "/10");
         releaseDate.setText(year);
-        Picasso.with(getApplicationContext()).load(posterPrefix + (String) movie.get("posterPath")).into(moviePoster);
+        if(!mIsFavourite){
+            Picasso.with(getApplicationContext()).load(posterPrefix + (String) movie.get("posterPath")).into(moviePoster);
+        }else{
+            moviePoster.setPadding(24, 224, 24, 24);
+            moviePoster.setImageResource(R.mipmap.movie_projector);
+        }
+
         Log.d(TAG, "poster path is: " + movie.get("posterPath"));
     }
 
