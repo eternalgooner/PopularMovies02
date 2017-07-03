@@ -1,4 +1,4 @@
-package david.com.popularmovies;
+package david.com.popularmovies.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -6,12 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import david.com.popularmovies.R;
 
 /**
  * Created by David on 13-Jun-17.
@@ -85,11 +86,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
         TextView lblListHeader = (TextView) convertView.findViewById(R.id.lblListHeader);
         lblListHeader.setText(headerTitle);
-
-//        View v = super.getGroupView(groupPosition, isExpanded, convertView, parent);
-//        ExpandableListView mExpandableListView = (ExpandableListView) parent;
-//        mExpandableListView.expandGroup(groupPosition);
-
         return convertView;
     }
 

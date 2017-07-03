@@ -1,4 +1,4 @@
-package david.com.popularmovies;
+package david.com.popularmovies.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,12 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.GridLayout;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import david.com.popularmovies.R;
+import david.com.popularmovies.db.FavMoviesContract;
 
 /**
  * Created by David on 13-May-17.

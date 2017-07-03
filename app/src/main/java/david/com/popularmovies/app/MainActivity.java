@@ -1,4 +1,4 @@
-package david.com.popularmovies;
+package david.com.popularmovies.app;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -31,6 +30,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import david.com.popularmovies.R;
+import david.com.popularmovies.adapters.MovieAdapter;
+import david.com.popularmovies.db.FavMoviesContract;
+import david.com.popularmovies.db.FavMoviesDbHelper;
+import david.com.popularmovies.utils.JsonUtils;
+import david.com.popularmovies.utils.NetworkUtils;
 
 /**
  *

@@ -1,4 +1,4 @@
-package david.com.popularmovies;
+package david.com.popularmovies.db;
 
 import android.net.Uri;
 import android.provider.BaseColumns;

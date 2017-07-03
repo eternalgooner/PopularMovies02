@@ -1,16 +1,13 @@
-package david.com.popularmovies;
+package david.com.popularmovies.app;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -20,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,9 +38,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import david.com.popularmovies.R;
+import david.com.popularmovies.adapters.ExpandableListAdapter;
+import david.com.popularmovies.db.FavMoviesContract;
+import david.com.popularmovies.db.FavMoviesDbHelper;
+import david.com.popularmovies.utils.JsonUtils;
+import david.com.popularmovies.utils.NetworkUtils;
 
 /**
  * Class that shows the selected movie details
@@ -77,7 +79,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private LinearLayout linearLayout;
     private ExpandableTextView expandableTextView;
     private HashMap movieSelected;
-    private boolean mIsFavourite = true;        //TODO bug - need to perform check in onCreate to see if movie coming in is FAV or not
+    private boolean mIsFavourite;        //TODO bug - need to perform check in onCreate to see if movie coming in is FAV or not
     private String[] videoKeys;
     private String[] reviews;
     private SQLiteDatabase mDb;

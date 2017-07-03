@@ -1,4 +1,4 @@
-package david.com.popularmovies;
+package david.com.popularmovies.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

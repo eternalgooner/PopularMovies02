@@ -1,4 +1,4 @@
-package david.com.popularmovies;
+package david.com.popularmovies.db;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -12,6 +12,9 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import david.com.popularmovies.db.FavMoviesContract;
+import david.com.popularmovies.db.FavMoviesDbHelper;
 
 /**
  * Created by David on 20-Jun-17.

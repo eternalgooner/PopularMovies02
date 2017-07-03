@@ -12,18 +12,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".app.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MovieDetailsActivity"></activity>
+        <activity android:name=".app.MovieDetailsActivity"></activity>
 
         <provider
             android:authorities="david.com.popularmovies"
-            android:name="david.com.popularmovies.MovieContentProvider"
+            android:name="david.com.popularmovies.db.MovieContentProvider"
             android:exported="false"/>
 
     </application>

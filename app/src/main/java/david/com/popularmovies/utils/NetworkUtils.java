@@ -1,4 +1,4 @@
-package david.com.popularmovies;
+package david.com.popularmovies.utils;
 
 import android.content.Context;
 import android.net.Uri;
@@ -10,6 +10,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
+
+import david.com.popularmovies.BuildConfig;
+import david.com.popularmovies.R;
 
 
 /**
