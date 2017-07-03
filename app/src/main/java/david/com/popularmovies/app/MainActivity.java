@@ -76,12 +76,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private String[] posterPaths;
     private ArrayList<HashMap> movieList;
     private GridLayoutManager gridLayoutManager;
-    private boolean showingMostPopular = true;
-    private boolean showingFavList = false;
+    //private boolean showingMostPopular = true;
+    //private boolean showingFavList = false;
     private Bundle movieBundle = new Bundle();
     private SQLiteDatabase mDb;
     private static final int THE_MOVIE_DB_MOST_POPULAR_LOADER = 58;
     private static final int THE_MOVIE_DB_HIGHEST_RATED_LOADER = 59;
+    private enum MenuState {MENU_MOST_POPULAR, MENU_HIGHEST_RATED, MENU_FAV}
+    private MenuState mMenuState = MenuState.MENU_MOST_POPULAR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Log.d(TAG, "entering onListItemClick");
         Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
 
-        if(showingFavList){
+        if(mMenuState == MenuState.MENU_FAV){
             HashMap<String, String> favMovie = new HashMap();
             Cursor cursor = getClickedMovieData(clickedItem+1);
 
@@ -178,8 +180,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             }
             favMovie = convertCursorDataToHashMapMovie(cursor);
             movieBundle.putSerializable("selectedMovie", favMovie);
+            movieBundle.putBoolean("isFav", true);
         }else{
             movieBundle.putSerializable("selectedMovie", movieList.get(clickedItem));
+            movieBundle.putBoolean("isFav", false);
         }
 
         intent.putExtras(movieBundle);
@@ -235,13 +239,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         switch (itemSelected){
             case R.id.menu_most_popular:
-                if(!showingMostPopular) showMostPopular();
+                if(mMenuState != MenuState.MENU_MOST_POPULAR) showMostPopular();
                 break;
             case R.id.menu_highest_rated:
-                if(showingMostPopular || showingFavList) showHighestRated();
+                if(mMenuState != MenuState.MENU_HIGHEST_RATED) showHighestRated();
                 break;
             case R.id.menu_favourites:
-                showFavourites();               //TODO shows favourites, but when clicking on fav movie, doesn't show, shows position from other list. Adapter work needed?
+                showFavourites();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -249,8 +253,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void showFavourites() {
         //TODO implement
-        showingMostPopular = false; //TODO fix bug - need to be able to go back to either most pop or highest rated from FAV - need to change boolean
-        showingFavList = true;
+        //showingMostPopular = false; //TODO fix bug - need to be able to go back to either most pop or highest rated from FAV - need to change boolean
+        //showingFavList = true;
+        mMenuState = MenuState.MENU_FAV;
         Cursor cursor = getAllFavMovies();
         mMovieAdapter = new MovieAdapter(this, cursor, this);
         mRecyclerView.setAdapter(mMovieAdapter);
@@ -259,15 +264,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void showHighestRated() {
         Log.d(TAG, "entering showHighestRated");
-        showingMostPopular = false;
-        showingFavList = false;
+        //showingMostPopular = false;
+        //showingFavList = false;
+        mMenuState = MenuState.MENU_HIGHEST_RATED;
         loadMovieList("highestRated");
     }
 
     private void showMostPopular() {
         Log.d(TAG, "entering showMostPopular");
-        showingMostPopular = true;
-        showingFavList = false;
+        //showingMostPopular = true;
+        //showingFavList = false;
+        mMenuState = MenuState.MENU_MOST_POPULAR;
         loadMovieList("mostPopular");
     }
 

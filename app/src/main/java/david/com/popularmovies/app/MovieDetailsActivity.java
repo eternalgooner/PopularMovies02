@@ -117,6 +117,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
         bundle = this.getIntent().getExtras();
         movieSelected = (HashMap) bundle.getSerializable("selectedMovie");
+        mIsFavourite = bundle.getBoolean("isFav");
 
         if(isNetworkAvailable() && !mIsFavourite){
             Log.d("TAG --- +++", "newtowrk is available & movie is not a FAV ");
@@ -186,7 +187,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         Loader<String> theMovieDbLoader = loaderManager.getLoader(THE_MOVIE_DB_TRAILER_LOADER);
 
         loaderManager.initLoader(THE_MOVIE_DB_TRAILER_LOADER, queryBundle, this).forceLoad();
-        //new MovieDetailsActivity.TheMovieDbTask().execute(myUrl);
     }
 
     private void loadMovieReview(String reviews) {
@@ -207,6 +207,28 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         String review = (String) movieSelected.get("review");
         Log.d("TAG --- +++", "review data is: " + review);
         expandableTextView.setText(review);
+
+        //try to load local trailer data
+        String trailerKey = (String) movieSelected.get("trailer");
+        trailerList = new ArrayList<>();
+        trailerList.add(trailerKey);
+//        for(String trailer : videoKeys){    //TODO change to for loop
+//            JSONObject reviewDetails = JsonUtils.getJSONObject(jsonMovieVideos, nextTrailer);
+//            videoKeys[nextTrailer] = JsonUtils.getString(reviewDetails, "key");
+//
+//            trailerList.add("Trailer " + nextTrailer);
+//
+//            ++nextTrailer;
+//        }
+
+        Log.d(TAG, "debugging trailer list ======= items are:" + Arrays.toString(trailerList.toArray()));
+
+
+        for(int i = 0; i < trailerList.size(); ++i){
+            Log.d(TAG, "key is: " + trailerList.get(i));
+        }
+        //if(trailerList.size() > 1) addExtraTrailerViewsIfNeeded();
+        addExtraTrailerViewsIfNeeded();
     }
 
     private boolean isNetworkAvailable(){
@@ -324,7 +346,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, (String) movieSelected.get("voteAverage"));
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, (String) movieSelected.get("releaseDate"));
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, (String) movieSelected.get("overview"));
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, videoKeys[0]);
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, videoKeys[0]);                //TODO defect, videoKeys[] can be null if no trailers, need check...
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, reviews[0]);                   //TODO defect, reviews[] can be null if no reviews, need check...
 
         Uri uri = getContentResolver().insert(FavMoviesContract.FavMovieEntry.CONTENT_URI, contentValues);
@@ -451,7 +473,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         trailerList = new ArrayList<>();
 
         int nextTrailer = 0;
-        for(String trailer : videoKeys){
+        for(String trailer : videoKeys){    //TODO change to for loop
             JSONObject reviewDetails = JsonUtils.getJSONObject(jsonMovieVideos, nextTrailer);
             videoKeys[nextTrailer] = JsonUtils.getString(reviewDetails, "key");
 
@@ -466,7 +488,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         for(int i = 0; i < videoKeys.length; ++i){
             Log.d(TAG, "key is: " + videoKeys[i]);
         }
-        if(videoKeys.length > 1) addExtraTrailerViewsIfNeeded();
+        //if(videoKeys.length > 1) addExtraTrailerViewsIfNeeded();
+        addExtraTrailerViewsIfNeeded();
     }
 
 
