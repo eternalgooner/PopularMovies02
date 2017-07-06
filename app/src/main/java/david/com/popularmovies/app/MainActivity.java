@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import david.com.popularmovies.R;
 import david.com.popularmovies.adapters.MovieAdapter;
 import david.com.popularmovies.db.FavMoviesContract;
 import david.com.popularmovies.db.FavMoviesDbHelper;
+import david.com.popularmovies.model.Movie;
 import david.com.popularmovies.utils.JsonUtils;
 import david.com.popularmovies.utils.NetworkUtils;
 
@@ -85,13 +87,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private enum MenuState {MENU_MOST_POPULAR, MENU_HIGHEST_RATED, MENU_FAV}
     private MenuState mMenuState = MenuState.MENU_MOST_POPULAR;
 
+    private ArrayList<Movie> newMovieList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "entering onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
-        movieList = new ArrayList<>();
+        //movieList = new ArrayList<>();
+        newMovieList = new ArrayList<>();
 
         if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
             gridLayoutManager = new GridLayoutManager(this, 3);
@@ -148,10 +153,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         //Loader<String> theMovieDbLoader = loaderManager.getLoader(THE_MOVIE_DB_LOADER);
 
         if(sortType.equals("mostPopular")){
-            movieList = new ArrayList<>();
+            //movieList = new ArrayList<>();
+            newMovieList = new ArrayList<>();
             loaderManager.initLoader(THE_MOVIE_DB_MOST_POPULAR_LOADER, queryBundle, this).forceLoad();
         }else if(sortType.equals("highestRated")){
-            movieList = new ArrayList<>();
+            //movieList = new ArrayList<>();
+            newMovieList = new ArrayList<>();
             loaderManager.initLoader(THE_MOVIE_DB_HIGHEST_RATED_LOADER, queryBundle, this).forceLoad();
         }
         Log.d(TAG, "exiting loadMovieList");
@@ -163,7 +170,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
 
         if(mMenuState == MenuState.MENU_FAV){
-            HashMap<String, String> favMovie = new HashMap();
+            //HashMap<String, String> favMovie = new HashMap();
+            Movie selectedFavMovie = null;
             Cursor cursor = getClickedMovieData(clickedItem+1);
 
             Log.e("cursor count is: ", cursor.getCount()+"");
@@ -176,12 +184,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 Log.e("debug cursor", cursor.getString(5));
                 Log.e("debug cursor", cursor.getString(6));
                 Log.e("debug cursor", cursor.getString(7));
+                Log.e("debug cursor", cursor.getString(8));
             }
-            favMovie = convertCursorDataToHashMapMovie(cursor);
-            movieBundle.putSerializable("selectedMovie", favMovie);
+            //favMovie = convertCursorDataToHashMapMovie(cursor);
+            selectedFavMovie = convertCursorDataToHashMapMovie(cursor);
+            //movieBundle.putSerializable("selectedMovie", favMovie);
+            intent.putExtra("selectedMovie", selectedFavMovie);
             movieBundle.putBoolean("isFav", true);
         }else{
-            movieBundle.putSerializable("selectedMovie", movieList.get(clickedItem));
+            //movieBundle.putSerializable("selectedMovie", movieList.get(clickedItem));
+            //movieBundle.putParcelable("selectedMovie", newMovieList.get(clickedItem));
+            intent.putExtra("selectedMovie", newMovieList.get(clickedItem));
             movieBundle.putBoolean("isFav", false);
         }
 
@@ -190,17 +203,32 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Log.d(TAG, "exiting onListItemClick");
     }
 
-    private HashMap<String,String> convertCursorDataToHashMapMovie(Cursor cursor) {
-        HashMap<String, String> movie = new HashMap<>();
+    private Movie convertCursorDataToHashMapMovie(Cursor cursor) {
+//        HashMap<String, String> movie = new HashMap<>();
+//
+//        cursor.moveToFirst();
+//        movie.put("title", cursor.getString(1));
+//        movie.put("voteAverage", cursor.getString(2));
+//        movie.put("releaseDate", cursor.getString(3));
+//        movie.put("overview", cursor.getString(4));
+//        movie.put("trailer", cursor.getString(5));
+//        movie.put("review", cursor.getString(6));
+//        movie.put("movieId", cursor.getString(7));
+//        movie.put("posterPath", cursor.getString(7));
+//        cursor.close();
+//        return movie;
+
+        Movie movie = new Movie();
 
         cursor.moveToFirst();
-        movie.put("title", cursor.getString(1));
-        movie.put("voteAverage", cursor.getString(2));
-        movie.put("releaseDate", cursor.getString(3));
-        movie.put("overview", cursor.getString(4));
-        movie.put("trailer", cursor.getString(5));
-        movie.put("review", cursor.getString(6));
-        movie.put("movieId", cursor.getString(7));
+        movie.setmTitle(cursor.getString(1));
+        movie.setmRating(cursor.getString(2));
+        movie.setmYear(cursor.getString(3));
+        movie.setmSummary(cursor.getString(4));
+        movie.setmTrailer(cursor.getString(5));
+        movie.setmReview(cursor.getString(6));
+        movie.setmMovieId(cursor.getString(7));
+        movie.setmPosterPath(cursor.getString(7));
         cursor.close();
         return movie;
     }
@@ -348,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                         posterPaths[next] = JsonUtils.getString(nextMovie, "poster_path");
                         Log.d(TAG, posterPaths[next]);
                         posterPaths[next] = "https://image.tmdb.org/t/p/w500/" + posterPaths[next];     //other poster sizes are w92, w154, w185, w342, w500, w780 or original
-                        getAllMovieData(nextMovie);
+                        getAllMovieData(nextMovie,  posterPaths[next]);
                         ++next;
                     }
                     Log.d(TAG, "exiting onLoadFinished");
@@ -357,16 +385,25 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 }
             }
 
-            private void getAllMovieData(JSONObject clickedMovie) {
+            private void getAllMovieData(JSONObject clickedMovie, String posterPath) {
                 Log.d(TAG, "ATL entering getAllMovieData");
                 HashMap movieMap = new HashMap();
-                movieMap.put("title", JsonUtils.getString(clickedMovie, "original_title"));
-                movieMap.put("overview", JsonUtils.getString(clickedMovie, "overview"));
-                movieMap.put("releaseDate", JsonUtils.getString(clickedMovie, "release_date"));
-                movieMap.put("posterPath", JsonUtils.getString(clickedMovie, "poster_path"));
-                movieMap.put("voteAverage", JsonUtils.getString(clickedMovie, "vote_average"));
-                movieMap.put("movieId", JsonUtils.getString(clickedMovie, "id"));
-                movieList.add(movieMap);
+                Movie movie = new Movie(JsonUtils.getString(clickedMovie, "original_title"),
+                                        JsonUtils.getString(clickedMovie, "vote_average"),
+                                        JsonUtils.getString(clickedMovie, "release_date"),
+                                        JsonUtils.getString(clickedMovie, "overview"),
+                                        "no trailer yet",
+                                        "no review yet",
+                                        JsonUtils.getString(clickedMovie, "id"),
+                                        posterPath);
+//                movieMap.put("title", JsonUtils.getString(clickedMovie, "original_title"));
+//                movieMap.put("overview", JsonUtils.getString(clickedMovie, "overview"));
+//                movieMap.put("releaseDate", JsonUtils.getString(clickedMovie, "release_date"));
+//                movieMap.put("posterPath", JsonUtils.getString(clickedMovie, "poster_path"));
+//                movieMap.put("voteAverage", JsonUtils.getString(clickedMovie, "vote_average"));
+//                movieMap.put("movieId", JsonUtils.getString(clickedMovie, "id"));
+                //movieList.add(movieMap);
+                newMovieList.add(movie);
                 Log.d(TAG, "ATL exiting getAllMovieData");
             }
 

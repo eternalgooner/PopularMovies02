@@ -45,6 +45,7 @@ import david.com.popularmovies.R;
 import david.com.popularmovies.adapters.ExpandableListAdapter;
 import david.com.popularmovies.db.FavMoviesContract;
 import david.com.popularmovies.db.FavMoviesDbHelper;
+import david.com.popularmovies.model.Movie;
 import david.com.popularmovies.utils.JsonUtils;
 import david.com.popularmovies.utils.NetworkUtils;
 
@@ -84,6 +85,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private String[] reviews;
     private SQLiteDatabase mDb;
     private Bundle bundle;
+    private Movie selectedMovie;
 
     private ExpandableListView listTrailerView;
     private ExpandableListAdapter listTrailerAdapter;
@@ -116,7 +118,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         listTrailerView = (ExpandableListView) findViewById(R.id.expLV);
 
         bundle = this.getIntent().getExtras();
-        movieSelected = (HashMap) bundle.getSerializable("selectedMovie");
+        //movieSelected = (HashMap) bundle.getSerializable("selectedMovie");
+        //TODO Movie here
+        selectedMovie = getIntent().getExtras().getParcelable("selectedMovie");
         mIsFavourite = bundle.getBoolean("isFav");
 
         if(isNetworkAvailable() && !mIsFavourite){
@@ -146,7 +150,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         moviePoster = (ImageView) findViewById(R.id.imgMoviePoster);
         FavMoviesDbHelper dbHelper = new FavMoviesDbHelper(this);
         mDb = dbHelper.getWritableDatabase();
-        displayMovieDetails(movieSelected);
+        //displayMovieDetails(movieSelected);
+        //TODO Movie here
+        displayMovieDetails(selectedMovie);
         Log.d(TAG, "exiting onCreate");
     }
 
@@ -171,7 +177,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void getTrailerData(String videos) {
-        String movieId = (String)(movieSelected.get("movieId"));
+        //String movieId = (String)(movieSelected.get("movieId"));
+        //TODO Movie here
+        String movieId = selectedMovie.getmMovieId();
         URL myUrl = NetworkUtils.buildUrl(videos, getApplicationContext(), movieId);
 
         Bundle queryBundle = new Bundle();
@@ -184,7 +192,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void loadMovieReview(String reviews) {
-        String movieId = (String)(movieSelected.get("movieId"));
+        //String movieId = (String)(movieSelected.get("movieId"));
+        //TODO Movie here
+        String movieId = selectedMovie.getmMovieId();
         URL myUrl = NetworkUtils.buildUrl(reviews, getApplicationContext(), movieId);
 
         Bundle queryBundle = new Bundle();
@@ -198,12 +208,16 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     private void loadLocalMovieData() {
         Log.d("TAG --- +++", "in loadLocalMovieData() ");
-        String review = (String) movieSelected.get("review");
+        //String review = (String) movieSelected.get("review");
+        //TODO Movie here
+        String review = selectedMovie.getmReview();
         Log.d("TAG --- +++", "review data is: " + review);
         expandableTextView.setText(review);
 
         //try to load local trailer data
-        String trailerKey = (String) movieSelected.get("trailer");
+        //String trailerKey = (String) movieSelected.get("trailer");
+        //TODO Movie here
+        String trailerKey = selectedMovie.getmTrailer();
         trailerList = new ArrayList<>();
         trailerList.add(trailerKey);
 //        for(String trailer : videoKeys){    //TODO change to for loop
@@ -233,23 +247,42 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         return ((activeNetworkInfo != null) && (activeNetworkInfo.isConnected()));
     }
 
-    private void displayMovieDetails(HashMap movie) {
+//    private void displayMovieDetails(HashMap movie) {
+//        Log.d(TAG, "entering displayMovieDetails");
+//        StringBuilder movieYear = new StringBuilder((String) movie.get("releaseDate"));
+//        String year = movieYear.substring(0,4);
+//        String posterPrefix = getString(R.string.url_poster_prefix);
+//        movieTitle.setText((String)movie.get("title"));
+//        movieSummary.setText((String)movie.get("overview"));
+//        userRating.setText((String)movie.get("voteAverage") + "/10");
+//        releaseDate.setText(year);
+//        if(!mIsFavourite){
+//            Picasso.with(getApplicationContext()).load(posterPrefix + (String) movie.get("posterPath")).into(moviePoster);
+//        }else{
+//            moviePoster.setPadding(24, 224, 24, 24);
+//            moviePoster.setImageResource(R.mipmap.movie_projector);
+//        }
+//
+//        Log.d(TAG, "poster path is: " + movie.get("posterPath"));
+//    }
+
+    private void displayMovieDetails(Movie movie) {
         Log.d(TAG, "entering displayMovieDetails");
-        StringBuilder movieYear = new StringBuilder((String) movie.get("releaseDate"));
+        StringBuilder movieYear = new StringBuilder(movie.getmYear());
         String year = movieYear.substring(0,4);
         String posterPrefix = getString(R.string.url_poster_prefix);
-        movieTitle.setText((String)movie.get("title"));
-        movieSummary.setText((String)movie.get("overview"));
-        userRating.setText((String)movie.get("voteAverage") + "/10");
+        movieTitle.setText(movie.getmTitle());
+        movieSummary.setText(movie.getmSummary());
+        userRating.setText(movie.getmRating() + "/10");
         releaseDate.setText(year);
         if(!mIsFavourite){
-            Picasso.with(getApplicationContext()).load(posterPrefix + (String) movie.get("posterPath")).into(moviePoster);
+            Picasso.with(getApplicationContext()).load(posterPrefix + movie.getmPosterPath()).into(moviePoster);
         }else{
             moviePoster.setPadding(24, 224, 24, 24);
             moviePoster.setImageResource(R.mipmap.movie_projector);
         }
 
-        Log.d(TAG, "poster path is: " + movie.get("posterPath"));
+        Log.d(TAG, "poster path is: " + movie.getmPosterPath());
     }
 
 
@@ -339,14 +372,25 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     private void addMovieToFav(){
         //TODO add all movie values into new movie object
+        //TODO Movie here
         ContentValues contentValues = new ContentValues();
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, (String) movieSelected.get("title"));
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, (String) movieSelected.get("voteAverage"));
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, (String) movieSelected.get("releaseDate"));
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, (String) movieSelected.get("overview"));
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, videoKeys[0]);                //TODO defect, videoKeys[] can be null if no trailers, need check...
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, reviews[0]);                   //TODO defect, reviews[] can be null if no reviews, need check...
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID, (String) movieSelected.get("movieId"));
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, selectedMovie.getmTitle());
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, selectedMovie.getmRating());
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, selectedMovie.getmYear());
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, selectedMovie.getmSummary());
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, selectedMovie.getmReview());                //TODO defect, videoKeys[] can be null if no trailers, need check...
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, selectedMovie.getmTrailer());                   //TODO defect, reviews[] can be null if no reviews, need check...
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID, selectedMovie.getmMovieId());
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_POSTER_PATH, selectedMovie.getmPosterPath());
+
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, (String) movieSelected.get("title"));
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, (String) movieSelected.get("voteAverage"));
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, (String) movieSelected.get("releaseDate"));
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, (String) movieSelected.get("overview"));
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, videoKeys[0]);                //TODO defect, videoKeys[] can be null if no trailers, need check...
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, reviews[0]);                   //TODO defect, reviews[] can be null if no reviews, need check...
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID, (String) movieSelected.get("movieId"));
 
         Uri uri = getContentResolver().insert(FavMoviesContract.FavMovieEntry.CONTENT_URI, contentValues);
 
