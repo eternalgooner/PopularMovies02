@@ -171,7 +171,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void getTrailerData(String videos) {
-        String movieId = (String)(movieSelected.get("id"));
+        String movieId = (String)(movieSelected.get("movieId"));
         URL myUrl = NetworkUtils.buildUrl(videos, getApplicationContext(), movieId);
 
         Bundle queryBundle = new Bundle();
@@ -184,7 +184,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void loadMovieReview(String reviews) {
-        String movieId = (String)(movieSelected.get("id"));
+        String movieId = (String)(movieSelected.get("movieId"));
         URL myUrl = NetworkUtils.buildUrl(reviews, getApplicationContext(), movieId);
 
         Bundle queryBundle = new Bundle();
@@ -346,6 +346,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, (String) movieSelected.get("overview"));
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, videoKeys[0]);                //TODO defect, videoKeys[] can be null if no trailers, need check...
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, reviews[0]);                   //TODO defect, reviews[] can be null if no reviews, need check...
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID, (String) movieSelected.get("movieId"));
 
         Uri uri = getContentResolver().insert(FavMoviesContract.FavMovieEntry.CONTENT_URI, contentValues);
 

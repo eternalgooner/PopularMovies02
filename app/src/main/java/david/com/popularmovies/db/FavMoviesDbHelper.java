@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class FavMoviesDbHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "favMovies.db";
+    private static final String DATABASE_NAME = "favMovies1.db";
     private static final int DATABASE_VERSION = 1;
 
     public FavMoviesDbHelper(Context context){
@@ -27,7 +27,8 @@ public class FavMoviesDbHelper extends SQLiteOpenHelper {
                 FavMoviesContract.FavMovieEntry.COLUMN_YEAR + " TEXT NOT NULL," +
                 FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY + " TEXT NOT NULL," +
                 FavMoviesContract.FavMovieEntry.COLUMN_TRAILER + " TEXT NOT NULL," +
-                FavMoviesContract.FavMovieEntry.COLUMN_REVIEW + " TEXT NOT NULL" +
+                FavMoviesContract.FavMovieEntry.COLUMN_REVIEW + " TEXT NOT NULL," +
+                FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID + " TEXT NOT NULL" +
                 ");";
 
         db.execSQL(SQL_CREATE_FAV_MOVIES_TABLE);

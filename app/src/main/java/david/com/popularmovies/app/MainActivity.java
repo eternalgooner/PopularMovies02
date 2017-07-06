@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 Log.e("debug cursor", cursor.getString(4));
                 Log.e("debug cursor", cursor.getString(5));
                 Log.e("debug cursor", cursor.getString(6));
+                Log.e("debug cursor", cursor.getString(7));
             }
             favMovie = convertCursorDataToHashMapMovie(cursor);
             movieBundle.putSerializable("selectedMovie", favMovie);
@@ -199,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         movie.put("overview", cursor.getString(4));
         movie.put("trailer", cursor.getString(5));
         movie.put("review", cursor.getString(6));
+        movie.put("movieId", cursor.getString(7));
         cursor.close();
         return movie;
     }
@@ -363,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 movieMap.put("releaseDate", JsonUtils.getString(clickedMovie, "release_date"));
                 movieMap.put("posterPath", JsonUtils.getString(clickedMovie, "poster_path"));
                 movieMap.put("voteAverage", JsonUtils.getString(clickedMovie, "vote_average"));
-                movieMap.put("id", JsonUtils.getString(clickedMovie, "id"));
+                movieMap.put("movieId", JsonUtils.getString(clickedMovie, "id"));
                 movieList.add(movieMap);
                 Log.d(TAG, "ATL exiting getAllMovieData");
             }

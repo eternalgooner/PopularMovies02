@@ -75,7 +75,9 @@ public class MovieContentProvider extends ContentProvider {
 
                 //selection is the _ID column = ?, and the selection args = the row ID form the Uri
                 String mSelection = "_id=?";
+                //TODO try searching by movieId. mSelection = "movieId";
                 String[] mSelectionArgs = new String[]{id};
+                //TODO try taking in movie ID as selectionArgs & using it below
 
                 retCursor = db.query(TABLE_NAME,
                         projection,

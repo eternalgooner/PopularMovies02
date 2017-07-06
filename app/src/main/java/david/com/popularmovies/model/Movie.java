@@ -9,6 +9,14 @@ import android.os.Parcelable;
 
 //TODO need to implement and use in code
 public class Movie implements Parcelable {
+
+    private String mTitle;
+    private String mRating;
+    private String mYear;
+    private String mSummary;
+    private String mName;
+    private String mName;
+
     protected Movie(Parcel in) {
     }
 
@@ -31,5 +39,6 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString();
     }
 }

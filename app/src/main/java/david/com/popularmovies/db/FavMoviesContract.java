@@ -32,5 +32,6 @@ public class FavMoviesContract {
         public final static String COLUMN_SUMMARY = "summary";
         public final static String COLUMN_TRAILER = "trailer";
         public final static String COLUMN_REVIEW = "review";
+        public final static String COLUMN_MOVIE_ID = "movieId";
     }
 }
