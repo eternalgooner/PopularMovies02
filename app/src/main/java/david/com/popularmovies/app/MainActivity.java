@@ -385,6 +385,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 }
             }
 
+            //TODO finished off here. need to set no review string for movies in first 2 lists - working for fav list
             private void getAllMovieData(JSONObject clickedMovie, String posterPath) {
                 Log.d(TAG, "ATL entering getAllMovieData");
                 HashMap movieMap = new HashMap();
@@ -392,8 +393,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                                         JsonUtils.getString(clickedMovie, "vote_average"),
                                         JsonUtils.getString(clickedMovie, "release_date"),
                                         JsonUtils.getString(clickedMovie, "overview"),
-                                        "no trailer yet",
-                                        "no review yet",
+                                        "there are no reviews for this movie yet",
+                                        "no trailer key yet",
                                         JsonUtils.getString(clickedMovie, "id"),
                                         posterPath);
 //                movieMap.put("title", JsonUtils.getString(clickedMovie, "original_title"));
