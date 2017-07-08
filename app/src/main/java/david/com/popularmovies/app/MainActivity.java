@@ -174,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             Movie selectedFavMovie = null;
             Cursor cursor = getClickedMovieData(clickedItem + 1); //TODO what's this +1??
 
+            //TODO left off here - empty cursor coming back from query DB
             Log.e("cursor count is: ", cursor.getCount()+"");
             while(cursor.moveToNext()){
                 Log.e("debug cursor", cursor.getString(0));
@@ -187,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 Log.e("debug cursor", cursor.getString(8));
             }
             //favMovie = convertCursorDataToHashMapMovie(cursor);
-            selectedFavMovie = convertCursorDataToHashMapMovie(cursor);
+            selectedFavMovie = convertCursorDataToMovieObject(cursor);
             //movieBundle.putSerializable("selectedMovie", favMovie);
             intent.putExtra("selectedMovie", selectedFavMovie);
             movieBundle.putBoolean("isFav", true);
@@ -204,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Log.d(TAG, "exiting onListItemClick");
     }
 
-    private Movie convertCursorDataToHashMapMovie(Cursor cursor) {
+    private Movie convertCursorDataToMovieObject(Cursor cursor) {
 //        HashMap<String, String> movie = new HashMap<>();
 //
 //        cursor.moveToFirst();
@@ -235,13 +236,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private Cursor getClickedMovieData(int clickedItem) {
+        String[] selectedMovie = { newMovieList.get(clickedItem).getmMovieId()+""};
         try{
             Uri uri = FavMoviesContract.FavMovieEntry.CONTENT_URI;
             uri = uri.buildUpon().appendPath(clickedItem+"").build();
             return getContentResolver().query(uri,
                     null,
-                    null,
-                    null,
+                    "movieId=?",
+                    selectedMovie,
                     null);
         }catch (Exception e){
             Log.e(TAG, "failed to async load data");

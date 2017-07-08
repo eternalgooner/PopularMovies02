@@ -69,23 +69,35 @@ public class MovieContentProvider extends ContentProvider {
                 break;
             case MOVIE_WITH_ID:
                 Log.d(TAG, " match found for MOVIE_WITH_ID in DB query method");
+                Log.d(TAG, "selction is: " + selection + " AND selArgs is: " + selectionArgs[0]);
                 //using selection & selectionArgs
                 //String id = uri.getPathSegments().get(1);
                 String id = uri.getLastPathSegment();
 
                 //selection is the _ID column = ?, and the selection args = the row ID form the Uri
-                String mSelection = "_id=?";
+                //String mSelection = "_id=?";
                 //TODO try searching by movieId. mSelection = "movieId";
                 String[] mSelectionArgs = new String[]{id};
                 //TODO try taking in movie ID as selectionArgs & using it below
 
-                retCursor = db.query(TABLE_NAME,
-                        projection,
-                        mSelection,
-                        mSelectionArgs,
-                        null,
-                        null,
-                        sortOrder);
+//                retCursor = db.query(TABLE_NAME,
+//                        projection,
+//                        selection,
+//                        mSelectionArgs,
+//                        null,
+//                        null,
+//                        sortOrder);
+                retCursor = db.rawQuery("SELECT * FROM favMovies WHERE movieId=?", selectionArgs);
+
+                retCursor.moveToFirst();
+                Log.d(TAG, retCursor.getString(1));
+                Log.d(TAG, retCursor.getString(2));
+                Log.d(TAG, retCursor.getString(3));
+                Log.d(TAG, retCursor.getString(4));
+                Log.d(TAG, retCursor.getString(5));
+                Log.d(TAG, retCursor.getString(6));
+                Log.d(TAG, retCursor.getString(7));
+
                 break;
 
             default:
