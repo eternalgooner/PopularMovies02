@@ -69,7 +69,7 @@ import david.com.popularmovies.utils.NetworkUtils;
 public class MovieDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>{
 
     private static final String TAG = MovieDetailsActivity.class.getSimpleName();
-    private ScrollView scrollView;
+    //private ScrollView scrollView;
     private ConstraintLayout cl;
     private TextView movieTitle;
     private ImageView moviePoster;
@@ -276,7 +276,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         userRating.setText(movie.getmRating() + "/10");
         releaseDate.setText(year);
         if(!mIsFavourite){
-            Picasso.with(getApplicationContext()).load(posterPrefix + movie.getmPosterPath()).into(moviePoster);
+            Picasso.with(getApplicationContext()).load(movie.getmPosterPath()).into(moviePoster);
         }else{
             moviePoster.setPadding(24, 224, 24, 24);
             moviePoster.setImageResource(R.mipmap.movie_projector);

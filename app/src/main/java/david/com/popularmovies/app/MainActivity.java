@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         if(mMenuState == MenuState.MENU_FAV){
             //HashMap<String, String> favMovie = new HashMap();
             Movie selectedFavMovie = null;
-            Cursor cursor = getClickedMovieData(clickedItem+1);
+            Cursor cursor = getClickedMovieData(clickedItem+1); //TODO what's this +1??
 
             Log.e("cursor count is: ", cursor.getCount()+"");
             while(cursor.moveToNext()){
@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             //movieBundle.putSerializable("selectedMovie", movieList.get(clickedItem));
             //movieBundle.putParcelable("selectedMovie", newMovieList.get(clickedItem));
             intent.putExtra("selectedMovie", newMovieList.get(clickedItem));
+            Log.e(TAG, "add movie here into intent. Movie poster path is " + newMovieList.get(clickedItem).getmPosterPath());
             movieBundle.putBoolean("isFav", false);
         }
 
