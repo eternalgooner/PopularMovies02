@@ -23,7 +23,7 @@ import david.com.popularmovies.db.FavMoviesDbHelper;
 public class MovieContentProvider extends ContentProvider {
 
     private FavMoviesDbHelper mFavMovieDbHelper;
-
+    private static final String TAG = MovieContentProvider.class.getSimpleName();
     public static final int FAV_MOVIES = 100;
     public static final int MOVIE_WITH_ID = 101;
 
@@ -58,7 +58,7 @@ public class MovieContentProvider extends ContentProvider {
 
         switch (match){
             case FAV_MOVIES:
-                Log.d("TAG", " match found for FAV_MOVIES in DB query method");
+                Log.d(TAG, " match found for FAV_MOVIES in DB query method");
                 retCursor = db.query(TABLE_NAME,
                         projection,
                         selection,
@@ -68,7 +68,7 @@ public class MovieContentProvider extends ContentProvider {
                         sortOrder);
                 break;
             case MOVIE_WITH_ID:
-                Log.d("TAG", " match found for MOVIE_WITH_ID in DB query method");
+                Log.d(TAG, " match found for MOVIE_WITH_ID in DB query method");
                 //using selection & selectionArgs
                 //String id = uri.getPathSegments().get(1);
                 String id = uri.getLastPathSegment();
@@ -130,7 +130,26 @@ public class MovieContentProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        Log.d(TAG, "entering delete method in ContentProvider");
+        final SQLiteDatabase db = mFavMovieDbHelper.getWritableDatabase();
+        int match = sUriMatcher.match(uri);
+        int transactionResult = 0;
+        String whereIdEquals = "movieId = ?";
+        String[] movieId = selectionArgs;
+
+        switch (match){
+            case MOVIE_WITH_ID:
+                Log.d(TAG, "found match in delete method in ContentProvider");
+                //delete movie from table
+                transactionResult = db.delete(TABLE_NAME, whereIdEquals, movieId);
+                break;
+            default:
+                transactionResult = -1;
+                throw new UnsupportedOperationException("Unknown uri: " + uri + ". Match is: " + match);
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return transactionResult;
     }
 
     @Override

@@ -26,6 +26,9 @@
             android:name="david.com.popularmovies.db.MovieContentProvider"
             android:exported="false"/>
 
+        <service android:name=".services.InsertOrDeleteFromDbService"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

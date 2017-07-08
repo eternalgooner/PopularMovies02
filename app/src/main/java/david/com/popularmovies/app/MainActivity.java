@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         if(mMenuState == MenuState.MENU_FAV){
             //HashMap<String, String> favMovie = new HashMap();
             Movie selectedFavMovie = null;
-            Cursor cursor = getClickedMovieData(clickedItem+1); //TODO what's this +1??
+            Cursor cursor = getClickedMovieData(clickedItem + 1); //TODO what's this +1??
 
             Log.e("cursor count is: ", cursor.getCount()+"");
             while(cursor.moveToNext()){

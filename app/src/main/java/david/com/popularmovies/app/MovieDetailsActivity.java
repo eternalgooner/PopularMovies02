@@ -46,6 +46,7 @@ import david.com.popularmovies.adapters.ExpandableListAdapter;
 import david.com.popularmovies.db.FavMoviesContract;
 import david.com.popularmovies.db.FavMoviesDbHelper;
 import david.com.popularmovies.model.Movie;
+import david.com.popularmovies.services.InsertOrDeleteFromDbService;
 import david.com.popularmovies.utils.JsonUtils;
 import david.com.popularmovies.utils.NetworkUtils;
 
@@ -294,6 +295,10 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     private void clickFav(View view){
         if(mIsFavourite){
+            Intent dbIntent = new Intent(this, InsertOrDeleteFromDbService.class);
+            dbIntent.putExtra("movieId", selectedMovie.getmMovieId());
+            dbIntent.putExtra("dbAction", -1);
+            startService(dbIntent);
             mFavStar.setImageResource(R.drawable.fav_star_off);
             Toast.makeText(getApplicationContext(), "removed from Favourites", Toast.LENGTH_SHORT).show();
             mIsFavourite = false;
@@ -382,15 +387,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, selectedMovie.getmTrailer());                   //TODO defect, reviews[] can be null if no reviews, need check...
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID, selectedMovie.getmMovieId());
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_POSTER_PATH, selectedMovie.getmPosterPath());
-
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, (String) movieSelected.get("title"));
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, (String) movieSelected.get("voteAverage"));
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, (String) movieSelected.get("releaseDate"));
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, (String) movieSelected.get("overview"));
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, videoKeys[0]);                //TODO defect, videoKeys[] can be null if no trailers, need check...
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, reviews[0]);                   //TODO defect, reviews[] can be null if no reviews, need check...
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID, (String) movieSelected.get("movieId"));
 
         Uri uri = getContentResolver().insert(FavMoviesContract.FavMovieEntry.CONTENT_URI, contentValues);
 
