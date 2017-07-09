@@ -90,13 +90,13 @@ public class MovieContentProvider extends ContentProvider {
                 retCursor = db.rawQuery("SELECT * FROM favMovies WHERE movieId=?", selectionArgs);
 
                 retCursor.moveToFirst();
-                Log.d(TAG, retCursor.getString(1));
-                Log.d(TAG, retCursor.getString(2));
-                Log.d(TAG, retCursor.getString(3));
-                Log.d(TAG, retCursor.getString(4));
-                Log.d(TAG, retCursor.getString(5));
-                Log.d(TAG, retCursor.getString(6));
-                Log.d(TAG, retCursor.getString(7));
+//                Log.d(TAG, retCursor.getString(1));
+//                Log.d(TAG, retCursor.getString(2));
+//                Log.d(TAG, retCursor.getString(3));
+//                Log.d(TAG, retCursor.getString(4));
+//                Log.d(TAG, retCursor.getString(5));
+//                Log.d(TAG, retCursor.getString(6));
+//                Log.d(TAG, retCursor.getString(7));
 
                 break;
 
