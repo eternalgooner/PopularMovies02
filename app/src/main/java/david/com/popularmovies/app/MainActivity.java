@@ -119,13 +119,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Log.d(TAG, "exiting onCreate");
     }
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//
-//        //re-queries for all tasks
-//        getSupportLoaderManager().restartLoader(THE_MOVIE_DB_MOST_POPULAR_LOADER, null, this); //TODO need to fix this as only working for popular movies, currently this breaks most popular
-//    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mMenuState == MenuState.MENU_FAV){
+            showFavourites();
+        }
+        //re-queries for all tasks
+        //getSupportLoaderManager().restartLoader(THE_MOVIE_DB_MOST_POPULAR_LOADER, null, this); //TODO need to fix this as only working for popular movies, currently this breaks most popular
+    }
 
     private boolean isNetworkAvailable(){
         Log.d(TAG, "entering isNetworkAvailable");

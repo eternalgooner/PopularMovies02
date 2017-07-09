@@ -307,7 +307,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             mIsFavourite = false;
         }else{
             mFavStar.setImageResource(R.drawable.fav_star_on);
-            addMovieToFav();
+            addMovieToFavUsingService();
             Toast.makeText(getApplicationContext(), "added to Favourites", Toast.LENGTH_SHORT).show();
             mIsFavourite = true;
         }
@@ -378,28 +378,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         listTrailerView.requestLayout();
     }
 
-    private void addMovieToFav(){
-        //TODO add all movie values into new movie object
-        //TODO Movie here
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, selectedMovie.getmTitle());
-//        Log.d(TAG, "in addMovieToFav() method, adding movie: " + selectedMovie.getmTitle() + " and ID is: " + selectedMovie.getmMovieId());
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, selectedMovie.getmRating());
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, selectedMovie.getmYear());
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, selectedMovie.getmSummary());
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, selectedMovie.getmReview());                //TODO defect, videoKeys[] can be null if no trailers, need check...
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, selectedMovie.getmTrailer());                   //TODO defect, reviews[] can be null if no reviews, need check...
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID, selectedMovie.getmMovieId());
-//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_POSTER_PATH, selectedMovie.getmPosterPath());
-//
-//        Uri uri = getContentResolver().insert(FavMoviesContract.FavMovieEntry.CONTENT_URI, contentValues);
-//
-//        if(uri != null){
-//            Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
-//        }
-
+    private void addMovieToFavUsingService(){
         Intent dbIntent = new Intent(this, InsertOrDeleteFromDbService.class);
-        //dbIntent.putExtra("movieId", selectedMovie.getmMovieId());
         dbIntent.putExtra("selectedMovie", selectedMovie);
         dbIntent.putExtra("dbAction", INSERT_ACTION);
         startService(dbIntent);
