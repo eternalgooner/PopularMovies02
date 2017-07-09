@@ -97,6 +97,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private static final int THE_MOVIE_DB_REVIEW_LOADER = 60;
     private static final int THE_MOVIE_DB_TRAILER_LOADER = 61;
 
+    private static final int INSERT_ACTION = 1;
+    private static final int DELETE_ACTION = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -297,7 +300,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         if(mIsFavourite){
             Intent dbIntent = new Intent(this, InsertOrDeleteFromDbService.class);
             dbIntent.putExtra("movieId", selectedMovie.getmMovieId());
-            dbIntent.putExtra("dbAction", -1);
+            dbIntent.putExtra("dbAction", DELETE_ACTION);
             startService(dbIntent);
             mFavStar.setImageResource(R.drawable.fav_star_off);
             Toast.makeText(getApplicationContext(), "removed from Favourites", Toast.LENGTH_SHORT).show();
@@ -378,24 +381,28 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private void addMovieToFav(){
         //TODO add all movie values into new movie object
         //TODO Movie here
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, selectedMovie.getmTitle());
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, selectedMovie.getmRating());
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, selectedMovie.getmYear());
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, selectedMovie.getmSummary());
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, selectedMovie.getmReview());                //TODO defect, videoKeys[] can be null if no trailers, need check...
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, selectedMovie.getmTrailer());                   //TODO defect, reviews[] can be null if no reviews, need check...
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID, selectedMovie.getmMovieId());
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_POSTER_PATH, selectedMovie.getmPosterPath());
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TITLE, selectedMovie.getmTitle());
+//        Log.d(TAG, "in addMovieToFav() method, adding movie: " + selectedMovie.getmTitle() + " and ID is: " + selectedMovie.getmMovieId());
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, selectedMovie.getmRating());
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, selectedMovie.getmYear());
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, selectedMovie.getmSummary());
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, selectedMovie.getmReview());                //TODO defect, videoKeys[] can be null if no trailers, need check...
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, selectedMovie.getmTrailer());                   //TODO defect, reviews[] can be null if no reviews, need check...
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID, selectedMovie.getmMovieId());
+//        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_POSTER_PATH, selectedMovie.getmPosterPath());
+//
+//        Uri uri = getContentResolver().insert(FavMoviesContract.FavMovieEntry.CONTENT_URI, contentValues);
+//
+//        if(uri != null){
+//            Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+//        }
 
-        Uri uri = getContentResolver().insert(FavMoviesContract.FavMovieEntry.CONTENT_URI, contentValues);
-
-        if(uri != null){
-            Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
-        }
-
-        //return mDb.insert(FavMoviesContract.FavMovieEntry.TABLE_NAME, null, contentValues);
-
+        Intent dbIntent = new Intent(this, InsertOrDeleteFromDbService.class);
+        //dbIntent.putExtra("movieId", selectedMovie.getmMovieId());
+        dbIntent.putExtra("selectedMovie", selectedMovie);
+        dbIntent.putExtra("dbAction", INSERT_ACTION);
+        startService(dbIntent);
     }
 
     @Override

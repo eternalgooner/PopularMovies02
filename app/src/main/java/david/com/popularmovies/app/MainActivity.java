@@ -37,6 +37,7 @@ import david.com.popularmovies.adapters.MovieAdapter;
 import david.com.popularmovies.db.FavMoviesContract;
 import david.com.popularmovies.db.FavMoviesDbHelper;
 import david.com.popularmovies.model.Movie;
+import david.com.popularmovies.utils.CursorUtils;
 import david.com.popularmovies.utils.JsonUtils;
 import david.com.popularmovies.utils.NetworkUtils;
 
@@ -172,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         if(mMenuState == MenuState.MENU_FAV){
             //HashMap<String, String> favMovie = new HashMap();
             Movie selectedFavMovie = null;
-            Cursor cursor = getClickedMovieData(clickedItem + 1); //TODO what's this +1??
+            Cursor cursor = getClickedMovieData(clickedItem); //TODO what's this +1??
 
             //TODO left off here - empty cursor coming back from query DB
             Log.e("cursor count is: ", cursor.getCount()+"");
@@ -187,14 +188,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 Log.e("debug cursor", cursor.getString(7));
                 Log.e("debug cursor", cursor.getString(8));
             }
-            //favMovie = convertCursorDataToHashMapMovie(cursor);
-            selectedFavMovie = convertCursorDataToMovieObject(cursor);
-            //movieBundle.putSerializable("selectedMovie", favMovie);
+            selectedFavMovie = CursorUtils.convertCursorToMovieObject(cursor);
             intent.putExtra("selectedMovie", selectedFavMovie);
             movieBundle.putBoolean("isFav", true);
+            //cursor.close();
         }else{
-            //movieBundle.putSerializable("selectedMovie", movieList.get(clickedItem));
-            //movieBundle.putParcelable("selectedMovie", newMovieList.get(clickedItem));
             intent.putExtra("selectedMovie", newMovieList.get(clickedItem));
             Log.e(TAG, "add movie here into intent. Movie poster path is " + newMovieList.get(clickedItem).getmPosterPath());
             movieBundle.putBoolean("isFav", false);
@@ -205,41 +203,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Log.d(TAG, "exiting onListItemClick");
     }
 
-    private Movie convertCursorDataToMovieObject(Cursor cursor) {
-//        HashMap<String, String> movie = new HashMap<>();
-//
-//        cursor.moveToFirst();
-//        movie.put("title", cursor.getString(1));
-//        movie.put("voteAverage", cursor.getString(2));
-//        movie.put("releaseDate", cursor.getString(3));
-//        movie.put("overview", cursor.getString(4));
-//        movie.put("trailer", cursor.getString(5));
-//        movie.put("review", cursor.getString(6));
-//        movie.put("movieId", cursor.getString(7));
-//        movie.put("posterPath", cursor.getString(7));
-//        cursor.close();
-//        return movie;
-
-        Movie movie = new Movie();
-
-        cursor.moveToFirst();
-        movie.setmTitle(cursor.getString(1));
-        movie.setmRating(cursor.getString(2));
-        movie.setmYear(cursor.getString(3));
-        movie.setmSummary(cursor.getString(4));
-        movie.setmTrailer(cursor.getString(5));
-        movie.setmReview(cursor.getString(6));
-        movie.setmMovieId(cursor.getString(7));
-        movie.setmPosterPath(cursor.getString(7));
-        cursor.close();
-        return movie;
-    }
-
     private Cursor getClickedMovieData(int clickedItem) {
         String[] selectedMovie = { newMovieList.get(clickedItem).getmMovieId()+""};
         try{
             Uri uri = FavMoviesContract.FavMovieEntry.CONTENT_URI;
-            uri = uri.buildUpon().appendPath(clickedItem+"").build();
+            uri = uri.buildUpon().appendPath(selectedMovie[0]).build();
+            Log.d(TAG, "SelectedMovie is: " + selectedMovie[0] + "....Uri sending to DB for fav movie query is: " + uri.toString());
             return getContentResolver().query(uri,
                     null,
                     "movieId=?",
@@ -284,9 +253,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         mMenuState = MenuState.MENU_FAV;
         txtNoNetworkMessage.setVisibility(View.INVISIBLE);
         Cursor cursor = getAllFavMovies();
+        refreshMovieList(cursor);
+        //cursor.close();
         mMovieAdapter = new MovieAdapter(this, cursor, this);
         mRecyclerView.setAdapter(mMovieAdapter);
         Toast.makeText(this, "show favs", Toast.LENGTH_SHORT).show();
+    }
+
+    private void refreshMovieList(Cursor cursor) {
+        newMovieList = CursorUtils.convertCursorToArrayListOfMovie(cursor);
     }
 
     private void showHighestRated() {
@@ -400,13 +375,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                                         "no trailer key yet",
                                         JsonUtils.getString(clickedMovie, "id"),
                                         posterPath);
-//                movieMap.put("title", JsonUtils.getString(clickedMovie, "original_title"));
-//                movieMap.put("overview", JsonUtils.getString(clickedMovie, "overview"));
-//                movieMap.put("releaseDate", JsonUtils.getString(clickedMovie, "release_date"));
-//                movieMap.put("posterPath", JsonUtils.getString(clickedMovie, "poster_path"));
-//                movieMap.put("voteAverage", JsonUtils.getString(clickedMovie, "vote_average"));
-//                movieMap.put("movieId", JsonUtils.getString(clickedMovie, "id"));
-                //movieList.add(movieMap);
                 newMovieList.add(movie);
                 Log.d(TAG, "ATL exiting getAllMovieData");
             }
