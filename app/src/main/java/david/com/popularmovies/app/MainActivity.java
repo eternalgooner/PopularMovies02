@@ -11,12 +11,10 @@ import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -29,7 +27,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,19 +50,19 @@ import david.com.popularmovies.utils.NetworkUtils;
  * - if there is a network connection it will:
  *      - build a URL
  *      - pass the URL to AsyncTaskLoader to retrieve JSON data from themoviedb
- *      - JSON data is then stored for each movie in a HashMap, which is then added to an ArrayList of movies
+ *      - JSON data is then stored for each movie in a Movie object, which is then added to an ArrayList of movies
  *      - display movie posters in a grid layout
  *
  * UI:
  * - create RecyclerView, GridLayoutManager & Adapter for displaying scrolling list
- * - create menu option to sort by highest rated or most popular
+ * - create menu option to sort by (i)Highest Rated, (ii)Most Popular or (iii)Favourites
  * - upon poster click, new activity should show clicked movie details
  *
  * STRING LITERALS:
  * - only string literals are in log statements
  *
  * ATTRIBUTION:
- * - some code was implemented with help from Udacity Android course
+ * - some code was implemented with help from Android Dev API, Udacity Android course & StackOverflow
  *
  * INFO:
  * you need to supply your own API key to retrieve data from themoviedb (API key is used in NetworkUtils class)
@@ -79,17 +76,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private MovieAdapter mMovieAdapter;
     private RecyclerView mRecyclerView;
     private String[] posterPaths;
-    //private ArrayList<HashMap> movieList;
     private GridLayoutManager gridLayoutManager;
-    //private boolean showingMostPopular = true;
-    //private boolean showingFavList = false;
     private Bundle movieBundle = new Bundle();
     private SQLiteDatabase mDb;
     private static final int THE_MOVIE_DB_MOST_POPULAR_LOADER = 58;
     private static final int THE_MOVIE_DB_HIGHEST_RATED_LOADER = 59;
     public enum MenuState {MENU_MOST_POPULAR, MENU_HIGHEST_RATED, MENU_FAV}
     private MenuState mMenuState = MenuState.MENU_MOST_POPULAR;
-
     private ArrayList<Movie> newMovieList;
 
     @Override
@@ -97,9 +90,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Log.d(TAG, "entering onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setSubtitle("Most Popular");
+        getSupportActionBar().setSubtitle(getString(R.string.Most_Popular));
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
-        //movieList = new ArrayList<>();
         newMovieList = new ArrayList<>();
 
         if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
@@ -118,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         FavMoviesDbHelper dbHelper = new FavMoviesDbHelper(this);
         mDb = dbHelper.getReadableDatabase();
-
         Log.d(TAG, "exiting onCreate");
     }
 
@@ -150,20 +141,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void loadMovieList(String sortType) {
         Log.d(TAG, "entering loadMovieList for " + sortType);
-        URL myUrl = NetworkUtils.buildUrl(sortType, getApplicationContext(), "0");      //TODO "0" needs to be changed to get the ID of the movie, used for getting reviews & trailers for movie
+        URL myUrl = NetworkUtils.buildUrl(sortType, getApplicationContext(), getString(R.string.default_id));      //TODO "0" needs to be changed to get the ID of the movie, used for getting reviews & trailers for movie
 
         Bundle queryBundle = new Bundle();
-        queryBundle.putString("theMovieDb" + sortType + "Query", myUrl.toString());
+        queryBundle.putString(getString(R.string.theMovieDb) + sortType + getString(R.string.Query), myUrl.toString());
 
         LoaderManager loaderManager = getSupportLoaderManager();
-        //Loader<String> theMovieDbLoader = loaderManager.getLoader(THE_MOVIE_DB_LOADER);
 
-        if(sortType.equals("mostPopular")){
-            //movieList = new ArrayList<>();
+        if(sortType.equals(getString(R.string.mostPopular))){
             newMovieList = new ArrayList<>();
             loaderManager.initLoader(THE_MOVIE_DB_MOST_POPULAR_LOADER, queryBundle, this).forceLoad();
-        }else if(sortType.equals("highestRated")){
-            //movieList = new ArrayList<>();
+        }else if(sortType.equals(getString(R.string.highestRated))){
             newMovieList = new ArrayList<>();
             loaderManager.initLoader(THE_MOVIE_DB_HIGHEST_RATED_LOADER, queryBundle, this).forceLoad();
         }
@@ -177,10 +165,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         if(mMenuState == MenuState.MENU_FAV){
             Movie selectedFavMovie = null;
-            Cursor cursor = getClickedMovieData(clickedItem); //TODO what's this +1??
+            Cursor cursor = getClickedMovieData(clickedItem);
 
             //TODO left off here - empty cursor coming back from query DB
-            Log.e("cursor count is: ", cursor.getCount()+"");
+            Log.e("cursor count is: ", cursor.getCount()+getString(R.string.emptyString));
             while(cursor.moveToNext()){
                 Log.e("debug cursor", cursor.getString(0));
                 Log.e("debug cursor", cursor.getString(1));
@@ -193,15 +181,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 Log.e("debug cursor", cursor.getString(8));
             }
             selectedFavMovie = CursorUtils.convertCursorToMovieObject(cursor);
-            intent.putExtra("selectedMovie", selectedFavMovie);
-            movieBundle.putBoolean("isFav", true);
+            intent.putExtra(getString(R.string.selectedMovie), selectedFavMovie);
+            movieBundle.putBoolean(getString(R.string.isFav), true);
             //cursor.close();
         }else{
-            intent.putExtra("selectedMovie", newMovieList.get(clickedItem));
-            intent.putExtra("menuState", mMenuState);
+            intent.putExtra(getString(R.string.selectedMovie), newMovieList.get(clickedItem));
+            intent.putExtra(getString(R.string.menuState), mMenuState);
             Log.e(TAG, "add movie here into intent. Movie poster path is " + newMovieList.get(clickedItem).getmPosterPath());
             boolean isFav = checkIfMovieIsAlreadyInFavourites(clickedItem);
-            movieBundle.putBoolean("isFav", isFav);
+            movieBundle.putBoolean(getString(R.string.isFav), isFav);
         }
 
         intent.putExtras(movieBundle);
@@ -225,10 +213,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             uri = uri.buildUpon().appendPath(selectedMovie[0]).build();
             Log.d(TAG, "SelectedMovie is: " + selectedMovie[0] + "....Uri sending to DB for fav movie query is: " + uri.toString());
             return getContentResolver().query(uri,
-                    null,
-                    "movieId=?",
-                    selectedMovie,
-                    null);
+                                            null,
+                                            getString(R.string.movieIdEqualsQuestionMark),
+                                            selectedMovie,
+                                            null);
         }catch (Exception e){
             Log.e(TAG, "failed to async load data");
             e.printStackTrace();
@@ -254,17 +242,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             case R.id.menu_most_popular:
                 if(mMenuState != MenuState.MENU_MOST_POPULAR) showMostPopular();
                 item.setChecked(true);
-                getSupportActionBar().setSubtitle("Most Popular");
+                getSupportActionBar().setSubtitle(getString(R.string.most_popular));
                 break;
             case R.id.menu_highest_rated:
                 if(mMenuState != MenuState.MENU_HIGHEST_RATED) showHighestRated();
                 item.setChecked(true);
-                getSupportActionBar().setSubtitle("Highest Rated");
+                getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
                 break;
             case R.id.menu_favourites:
                 showFavourites();
                 item.setChecked(true);
-                getSupportActionBar().setSubtitle("Favourites");
+                getSupportActionBar().setSubtitle(getString(R.string.Favourites));
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -278,7 +266,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         //cursor.close();
         mMovieAdapter = new MovieAdapter(this, cursor, this);
         mRecyclerView.setAdapter(mMovieAdapter);
-        Toast.makeText(this, "show favs", Toast.LENGTH_SHORT).show();
     }
 
     private void refreshMovieList(Cursor cursor) {
@@ -315,8 +302,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             @Override
             public String loadInBackground() {
                 Log.d(TAG, "--- entering loadInBackground in Loader method ---");
-                String theMovieDbMostPopularQueryString = args.getString("theMovieDbmostPopularQuery");
-                String theMovieDbHighestRatedQueryString = args.getString("theMovieDbhighestRatedQuery");
+                String theMovieDbMostPopularQueryString = args.getString(getString(R.string.tmdbMostPopQuery));
+                String theMovieDbHighestRatedQueryString = args.getString(getString(R.string.tmdbHighestRatedQuery));
 
                 if(id == THE_MOVIE_DB_MOST_POPULAR_LOADER){
                     return processMostPopularInBackground(theMovieDbMostPopularQueryString);
@@ -362,19 +349,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             }
 
             private void getAllPosterPathsAndMovieDataFromJson(String stringResponseFromRequest) {
-                Log.d(TAG, " £££££££££   entering getAllPosterPathsAndMovieDataFromJson ££££££££");
+                Log.d(TAG, "entering getAllPosterPathsAndMovieDataFromJson");
                 posterPaths = new String[20];
-                if (stringResponseFromRequest != null && !stringResponseFromRequest.equals("")) {
+                if (stringResponseFromRequest != null && !stringResponseFromRequest.equals(getString(R.string.emptyString))) {
                     Log.d(TAG, stringResponseFromRequest);
                     JSONObject jsonObject = JsonUtils.getJSONObject(stringResponseFromRequest);
-                    JSONArray jsonMoviesArray = JsonUtils.getJSONArray(jsonObject, "results");
-                    String[] moviesResult = new String[jsonMoviesArray.length()];
+                    JSONArray jsonMoviesArray = JsonUtils.getJSONArray(jsonObject, getString(R.string.results));
+                    //String[] moviesResult = new String[jsonMoviesArray.length()];
                     int next = 0;
-                    for(String movie : moviesResult){
+                    for(int i = 0; i < jsonMoviesArray.length(); ++i){
                         JSONObject nextMovie = JsonUtils.getJSONObject(jsonMoviesArray, next);
-                        posterPaths[next] = JsonUtils.getString(nextMovie, "poster_path");
+                        posterPaths[next] = JsonUtils.getString(nextMovie, getString(R.string.poster_path));
                         Log.d(TAG, posterPaths[next]);
-                        posterPaths[next] = "https://image.tmdb.org/t/p/w500/" + posterPaths[next];     //other poster sizes are w92, w154, w185, w342, w500, w780 or original
+                        posterPaths[next] = getString(R.string.base_poster_path) + posterPaths[next];     //other poster sizes are w92, w154, w185, w342, w500, w780 or original
                         getAllMovieData(nextMovie,  posterPaths[next]);
                         ++next;
                     }
@@ -387,13 +374,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             //TODO finished off here. need to set no review string for movies in first 2 lists - working for fav list
             private void getAllMovieData(JSONObject clickedMovie, String posterPath) {
                 Log.d(TAG, "ATL entering getAllMovieData");
-                HashMap movieMap = new HashMap();
                 Movie movie = new Movie(JsonUtils.getString(clickedMovie, "original_title"),
                                         JsonUtils.getString(clickedMovie, "vote_average"),
                                         JsonUtils.getString(clickedMovie, "release_date"),
                                         JsonUtils.getString(clickedMovie, "overview"),
-                                        "there are no reviews for this movie yet",
-                                        "no trailer key yet",
+                                        "no trailers",          //TODO check this, maybe set as null? otherwise always showing one trailer, but won't load if really no trailer
+                                        "no reviews yet",
                                         JsonUtils.getString(clickedMovie, "id"),
                                         posterPath);
                 newMovieList.add(movie);
@@ -423,20 +409,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private Cursor getAllFavMovies(){
-        try{
-            return getContentResolver().query(FavMoviesContract.FavMovieEntry.CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null);
-        }catch (Exception e){
-            Log.e(TAG, "failed to async load data");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private Cursor showSelectedFavMovie(){
         try{
             return getContentResolver().query(FavMoviesContract.FavMovieEntry.CONTENT_URI,
                     null,

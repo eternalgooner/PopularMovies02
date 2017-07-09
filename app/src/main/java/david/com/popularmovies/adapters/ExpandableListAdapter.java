@@ -31,7 +31,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
         //Log.d(TAG, Arrays.toString(listHashMap.get(0).toArray()));
 
-        Log.d(TAG, "******* in constructor, listDataHeader size is: " + this.listDataHeader.size() + " & includes: " + this.listDataHeader.get(0) + "  ....and listHashMap size is " + this.listHashMap.get(listDataHeader.get(0)).size() + "...and includes " + Arrays.toString(this.listHashMap.get(listDataHeader.get(0)).toArray()));
+        Log.d(TAG, "in constructor, listDataHeader size is: " + this.listDataHeader.size() + " & includes: " + this.listDataHeader.get(0) + "  ....and listHashMap size is " + this.listHashMap.get(listDataHeader.get(0)).size() + "...and includes " + Arrays.toString(this.listHashMap.get(listDataHeader.get(0)).toArray()));
     }
 
     @Override
@@ -91,8 +91,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        Log.d(TAG, " ???????? in getChildView returning VIEW");
-//      final String childText = (String) getChild(groupPosition, childPosition);
+        Log.d(TAG, "in getChildView returning VIEW");
         final String childText = (String) (String.valueOf(childPosition + 1));
         if(convertView == null){
             LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -100,7 +99,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
         TextView txtListChild = (TextView) convertView.findViewById(R.id.lblListItem);
         txtListChild.setCompoundDrawablesWithIntrinsicBounds(R.drawable.play, 0, 0, 0);
-        txtListChild.setText("Trailer " + childText);
+        txtListChild.setText(context.getString(R.string.trailer_) + childText);
 
         return convertView;
     }

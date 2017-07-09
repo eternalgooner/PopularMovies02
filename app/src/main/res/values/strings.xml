@@ -24,6 +24,22 @@
     <string name="menu_favourites">Favourites</string>
     <string name="mostPopular">mostPopular</string>
     <string name="highestRated">highestRated</string>
+    <string name="trailer_">Trailer</string>
+    <string name="Most_Popular">Most Popular</string>
+    <string name="default_id">0</string>
+    <string name="theMovieDb">theMovieDb</string>
+    <string name="Query">Query</string>
+    <string name="emptyString" />
+    <string name="selectedMovie">selectedMovie</string>
+    <string name="isFav">isFav</string>
+    <string name="menuState">menuState</string>
+    <string name="movieIdEqualsQuestionMark">movieId=?</string>
+    <string name="Favourites">Favourites</string>
+    <string name="tmdbMostPopQuery">theMovieDbmostPopularQuery</string>
+    <string name="tmdbHighestRatedQuery">theMovieDbhighestRatedQuery</string>
+    <string name="results">results</string>
+    <string name="poster_path">poster_path</string>
+    <string name="base_poster_path">https://image.tmdb.org/t/p/w500/</string>
 
 
 </resources>

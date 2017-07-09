@@ -50,14 +50,14 @@ import david.com.popularmovies.utils.NetworkUtils;
 /**
  * Class that shows the selected movie details
  * - movie details are retrieved as a bundle from the intent
- * - movie details are then retrieved as a HashMap from the bundle
- * - AsyncTasks are called at start of the activity to get review & trailer data
+ * - movie details are then retrieved as a Movie from the bundle
+ * - AsyncTasksLoaders are called at start of the activity to get review & trailer data
  *
  * UI:
  * - LinearLayout used with multiple CardViews
  *
  * STRING LITERALS:
- * - string literals have not been put into the strings.xml file as they are not user-facing
+ * - string literals in log statements only
  *
  * ATTRIBUTION:
  * - some code was implemented with help from StackOverflow
@@ -67,8 +67,6 @@ import david.com.popularmovies.utils.NetworkUtils;
 public class MovieDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>{
 
     private static final String TAG = MovieDetailsActivity.class.getSimpleName();
-    //private ScrollView scrollView;
-    private ConstraintLayout cl;
     private TextView movieTitle;
     private ImageView moviePoster;
     private TextView userRating;
@@ -77,27 +75,21 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     protected TextView movieSummary;
     private LinearLayout linearLayout;
     private ExpandableTextView expandableTextView;
-    private HashMap movieSelected;
-    private boolean mIsFavourite;        //TODO bug - need to perform check in onCreate to see if movie coming in is FAV or not - need to go to DB with ID prob (add movie ID attr in DB)
+    private boolean mIsFavourite;
     private String[] videoKeys;
     private String[] reviews;
     private SQLiteDatabase mDb;
     private Bundle bundle;
     private Movie selectedMovie;
-
     private ExpandableListView listTrailerView;
     private ExpandableListAdapter listTrailerAdapter;
     private List<String> listDataHeader;
     private HashMap<String, List<String>> listHash;
     private List<String> trailerList;
-
     private static final int THE_MOVIE_DB_REVIEW_LOADER = 60;
     private static final int THE_MOVIE_DB_TRAILER_LOADER = 61;
-
     private static final int INSERT_ACTION = 1;
     private static final int DELETE_ACTION = -1;
-
-    //private enum MenuState {MENU_MOST_POPULAR, MENU_HIGHEST_RATED, MENU_FAV}
     private MainActivity.MenuState cameFromMenuState;
 
     @Override
@@ -120,7 +112,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         listTrailerView = (ExpandableListView) findViewById(R.id.expLV);
 
         bundle = this.getIntent().getExtras();
-        selectedMovie = getIntent().getExtras().getParcelable("selectedMovie");
+        selectedMovie = getIntent().getExtras().getParcelable(getString(R.string.selectedMovie));
         mIsFavourite = bundle.getBoolean("isFav");
         cameFromMenuState = (MainActivity.MenuState) bundle.get("menuState");
         Log.d(TAG, "came from menu state: " + cameFromMenuState);

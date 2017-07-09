@@ -36,7 +36,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     private static final String TAG = MovieAdapter.class.getSimpleName();
     private ListItemClickListener onClickListener;
     private String[] mPosterPaths;
-
     private Cursor mCursor;
     private boolean isFavAdapter;
 
@@ -79,7 +78,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
         Log.d(TAG, "entering onBindViewHolder");
 
-        //int width = context.getResources().getDisplayMetrics().widthPixels;
         if(!isFavAdapter){
             Log.d(TAG, mPosterPaths[position]);
             Picasso.with(context).load(mPosterPaths[position]).into(holder.mImageView);
@@ -98,12 +96,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
             holder.mFavImageView.setImageResource(R.mipmap.movie_projector);
             holder.mTextView.setText(title);
-            //if(position % 2 == 0){
-                holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
-            //}else{
-             //   holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
-             //   holder.mTextView.setTextColor(Color.WHITE);
-            //}
+            holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
         }
 
         Log.d(TAG, "exiting onBindViewHolder");
@@ -121,15 +114,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
         public ImageView mImageView;
-
         public ImageView mFavImageView;
         public TextView mTextView;
 
         public MovieAdapterViewHolder(View itemView) {
             super(itemView);
-            //frameLayout = (FrameLayout) itemView.findViewById(R.id.gv_item_view);
 
             if(!isFavAdapter){
                 mImageView = (ImageView) itemView.findViewById(R.id.item_imageView);
