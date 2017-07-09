@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private MovieAdapter mMovieAdapter;
     private RecyclerView mRecyclerView;
     private String[] posterPaths;
-    private ArrayList<HashMap> movieList;
+    //private ArrayList<HashMap> movieList;
     private GridLayoutManager gridLayoutManager;
     //private boolean showingMostPopular = true;
     //private boolean showingFavList = false;
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private SQLiteDatabase mDb;
     private static final int THE_MOVIE_DB_MOST_POPULAR_LOADER = 58;
     private static final int THE_MOVIE_DB_HIGHEST_RATED_LOADER = 59;
-    private enum MenuState {MENU_MOST_POPULAR, MENU_HIGHEST_RATED, MENU_FAV}
+    public enum MenuState {MENU_MOST_POPULAR, MENU_HIGHEST_RATED, MENU_FAV}
     private MenuState mMenuState = MenuState.MENU_MOST_POPULAR;
 
     private ArrayList<Movie> newMovieList;
@@ -173,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
 
         if(mMenuState == MenuState.MENU_FAV){
-            //HashMap<String, String> favMovie = new HashMap();
             Movie selectedFavMovie = null;
             Cursor cursor = getClickedMovieData(clickedItem); //TODO what's this +1??
 
@@ -196,13 +195,24 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             //cursor.close();
         }else{
             intent.putExtra("selectedMovie", newMovieList.get(clickedItem));
+            intent.putExtra("menuState", mMenuState);
             Log.e(TAG, "add movie here into intent. Movie poster path is " + newMovieList.get(clickedItem).getmPosterPath());
-            movieBundle.putBoolean("isFav", false);
+            boolean isFav = checkIfMovieIsAlreadyInFavourites(clickedItem);
+            movieBundle.putBoolean("isFav", isFav);
         }
 
         intent.putExtras(movieBundle);
         MainActivity.this.startActivity(intent);
         Log.d(TAG, "exiting onListItemClick");
+    }
+
+    private boolean checkIfMovieIsAlreadyInFavourites(int clickedItem) {
+        Cursor cursor = getClickedMovieData(clickedItem);
+        if(cursor.getCount() < 1){
+            return false;
+        }else{
+            return true;
+        }
     }
 
     private Cursor getClickedMovieData(int clickedItem) {

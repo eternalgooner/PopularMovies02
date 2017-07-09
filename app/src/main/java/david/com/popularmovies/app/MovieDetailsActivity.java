@@ -1,6 +1,5 @@
 package david.com.popularmovies.app;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,7 +23,6 @@ import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +41,6 @@ import java.util.List;
 
 import david.com.popularmovies.R;
 import david.com.popularmovies.adapters.ExpandableListAdapter;
-import david.com.popularmovies.db.FavMoviesContract;
 import david.com.popularmovies.db.FavMoviesDbHelper;
 import david.com.popularmovies.model.Movie;
 import david.com.popularmovies.services.InsertOrDeleteFromDbService;
@@ -100,6 +97,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private static final int INSERT_ACTION = 1;
     private static final int DELETE_ACTION = -1;
 
+    //private enum MenuState {MENU_MOST_POPULAR, MENU_HIGHEST_RATED, MENU_FAV}
+    private MainActivity.MenuState cameFromMenuState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +126,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         //TODO Movie here
         selectedMovie = getIntent().getExtras().getParcelable("selectedMovie");
         mIsFavourite = bundle.getBoolean("isFav");
+        cameFromMenuState = (MainActivity.MenuState) bundle.get("menuState");
+        Log.d(TAG, "came from menu state: " + cameFromMenuState);
 
         if(isNetworkAvailable() && !mIsFavourite){
             Log.d("TAG --- +++", "newtowrk is available & movie is not a FAV ");
@@ -282,10 +284,13 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         if(!mIsFavourite){
             Picasso.with(getApplicationContext()).load(movie.getmPosterPath()).into(moviePoster);
         }else{
-            moviePoster.setPadding(24, 224, 24, 24);
-            moviePoster.setImageResource(R.mipmap.movie_projector);
+            if(cameFromMenuState != MainActivity.MenuState.MENU_FAV){
+                Picasso.with(getApplicationContext()).load(movie.getmPosterPath()).into(moviePoster);
+            }else {
+                moviePoster.setPadding(24, 224, 24, 24);
+                moviePoster.setImageResource(R.mipmap.movie_projector);
+            }
         }
-
         Log.d(TAG, "poster path is: " + movie.getmPosterPath());
     }
 
