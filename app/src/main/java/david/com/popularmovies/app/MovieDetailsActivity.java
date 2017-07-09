@@ -114,16 +114,12 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         userRating = (TextView) findViewById(R.id.txtMovieUserRating);
         releaseDate = (TextView) findViewById(R.id.txtMovieReleaseDate);
         movieSummary = (TextView) findViewById(R.id.txtMovieSummary);
-
         mFavStar = (ImageButton) findViewById(R.id.imgFavStar);
         linearLayout = (LinearLayout) findViewById(R.id.ll_play_trailer);
         expandableTextView = (ExpandableTextView) findViewById(R.id.expandable_text_view);
-
         listTrailerView = (ExpandableListView) findViewById(R.id.expLV);
 
         bundle = this.getIntent().getExtras();
-        //movieSelected = (HashMap) bundle.getSerializable("selectedMovie");
-        //TODO Movie here
         selectedMovie = getIntent().getExtras().getParcelable("selectedMovie");
         mIsFavourite = bundle.getBoolean("isFav");
         cameFromMenuState = (MainActivity.MenuState) bundle.get("menuState");
@@ -156,8 +152,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         moviePoster = (ImageView) findViewById(R.id.imgMoviePoster);
         FavMoviesDbHelper dbHelper = new FavMoviesDbHelper(this);
         mDb = dbHelper.getWritableDatabase();
-        //displayMovieDetails(movieSelected);
-        //TODO Movie here
         displayMovieDetails(selectedMovie);
         Log.d(TAG, "exiting onCreate");
     }
@@ -165,13 +159,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
 
     private void playTrailer(String trailerId) {
-        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + trailerId));
-
         Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailerId));
-
-//        PackageManager packageManager = getPackageManager();
-//        List activities = packageManager.queryIntentActivities(webIntent, PackageManager.MATCH_DEFAULT_ONLY);
-//        boolean isIntentSafe = activities.size() > 0;
 
         PackageManager packageManager = getPackageManager();
         List activities = packageManager.queryIntentActivities(appIntent, PackageManager.MATCH_DEFAULT_ONLY);
@@ -183,8 +171,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void getTrailerData(String videos) {
-        //String movieId = (String)(movieSelected.get("movieId"));
-        //TODO Movie here
         String movieId = selectedMovie.getmMovieId();
         URL myUrl = NetworkUtils.buildUrl(videos, getApplicationContext(), movieId);
 
@@ -198,8 +184,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void loadMovieReview(String reviews) {
-        //String movieId = (String)(movieSelected.get("movieId"));
-        //TODO Movie here
         String movieId = selectedMovie.getmMovieId();
         URL myUrl = NetworkUtils.buildUrl(reviews, getApplicationContext(), movieId);
 
@@ -207,33 +191,19 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         queryBundle.putString("theMovieDbReviewQuery", myUrl.toString());
 
         LoaderManager loaderManager = getSupportLoaderManager();
-        //Loader<String> theMovieDbLoader = loaderManager.getLoader(THE_MOVIE_DB_REVIEW_LOADER);
 
         loaderManager.initLoader(THE_MOVIE_DB_REVIEW_LOADER, queryBundle, this).forceLoad();
     }
 
     private void loadLocalMovieData() {
         Log.d("TAG --- +++", "in loadLocalMovieData() ");
-        //String review = (String) movieSelected.get("review");
-        //TODO Movie here
         String review = selectedMovie.getmReview();
         Log.d("TAG --- +++", "review data is: " + review);
         expandableTextView.setText(review);
 
-        //try to load local trailer data
-        //String trailerKey = (String) movieSelected.get("trailer");
-        //TODO Movie here
         String trailerKey = selectedMovie.getmTrailer();
         trailerList = new ArrayList<>();
         trailerList.add(trailerKey);
-//        for(String trailer : videoKeys){    //TODO change to for loop
-//            JSONObject reviewDetails = JsonUtils.getJSONObject(jsonMovieVideos, nextTrailer);
-//            videoKeys[nextTrailer] = JsonUtils.getString(reviewDetails, "key");
-//
-//            trailerList.add("Trailer " + nextTrailer);
-//
-//            ++nextTrailer;
-//        }
 
         Log.d(TAG, "debugging trailer list ======= items are:" + Arrays.toString(trailerList.toArray()));
 
@@ -241,7 +211,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         for(int i = 0; i < trailerList.size(); ++i){
             Log.d(TAG, "key is: " + trailerList.get(i));
         }
-        //if(trailerList.size() > 1) addExtraTrailerViewsIfNeeded();
         addExtraTrailerViewsIfNeeded();
     }
 

@@ -11,10 +11,12 @@ import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -95,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Log.d(TAG, "entering onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setSubtitle("Most Popular");
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
         //movieList = new ArrayList<>();
         newMovieList = new ArrayList<>();
@@ -250,12 +253,18 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         switch (itemSelected){
             case R.id.menu_most_popular:
                 if(mMenuState != MenuState.MENU_MOST_POPULAR) showMostPopular();
+                item.setChecked(true);
+                getSupportActionBar().setSubtitle("Most Popular");
                 break;
             case R.id.menu_highest_rated:
                 if(mMenuState != MenuState.MENU_HIGHEST_RATED) showHighestRated();
+                item.setChecked(true);
+                getSupportActionBar().setSubtitle("Highest Rated");
                 break;
             case R.id.menu_favourites:
                 showFavourites();
+                item.setChecked(true);
+                getSupportActionBar().setSubtitle("Favourites");
                 break;
         }
         return super.onOptionsItemSelected(item);
