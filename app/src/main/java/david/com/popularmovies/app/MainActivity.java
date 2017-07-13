@@ -84,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public enum MenuState {MENU_MOST_POPULAR, MENU_HIGHEST_RATED, MENU_FAV}
     private MenuState mMenuState = MenuState.MENU_MOST_POPULAR;
     private ArrayList<Movie> newMovieList;
+    //private Menu menu;
+    private int currentMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +114,50 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         mDb = dbHelper.getReadableDatabase();
         Log.d(TAG, "exiting onCreate");
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable("movieList", newMovieList);
+        outState.putStringArray("posterPaths", posterPaths);
+        outState.putInt("menu", currentMenu);
+//        byte menuState = 0;
+//        if(mMenuState == MenuState.MENU_FAV){
+//            menuState = 3;
+//        }else if(mMenuState == MenuState.MENU_HIGHEST_RATED){
+//            menuState = 2;
+//        }else if(mMenuState == MenuState.MENU_MOST_POPULAR){
+//            menuState = 1;
+//        }else{
+//            Log.e(TAG, "error when saving menu state in onSavedInstanceState - no match found");
+//        }
+//        outState.putByte("menuState", menuState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        newMovieList = (ArrayList<Movie>) savedInstanceState.getSerializable("movieList");
+        posterPaths = savedInstanceState.getStringArray("posterPaths");
+        currentMenu = savedInstanceState.getInt("menu");
+        //byte menuState = savedInstanceState.getByte("menuState");
+        if(currentMenu == 1){
+            mMenuState = MenuState.MENU_MOST_POPULAR;
+        }else if(currentMenu == 2){
+            mMenuState = MenuState.MENU_HIGHEST_RATED;
+            //item.setChecked(true);
+
+            getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
+        }else if(currentMenu == 3){
+            mMenuState = MenuState.MENU_FAV;
+            getSupportActionBar().setSubtitle(getString(R.string.Favourites));
+        }else{
+            Log.e(TAG, "error when restoring menu state in onRestoreInstanceState - no match found");
+        }
+        showMovies();
+    }
+
 
     @Override
     protected void onResume() {
@@ -228,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(TAG, "entering onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.movie_menu, menu);
+        //this.menu = menu;
         Log.d(TAG, "exiting onCreateOptionsMenu");
         return true;
     }
@@ -243,16 +290,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 if(mMenuState != MenuState.MENU_MOST_POPULAR) showMostPopular();
                 item.setChecked(true);
                 getSupportActionBar().setSubtitle(getString(R.string.most_popular));
+                currentMenu = 1;
                 break;
             case R.id.menu_highest_rated:
                 if(mMenuState != MenuState.MENU_HIGHEST_RATED) showHighestRated();
                 item.setChecked(true);
                 getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
+                currentMenu = 2;
                 break;
             case R.id.menu_favourites:
                 showFavourites();
                 item.setChecked(true);
                 getSupportActionBar().setSubtitle(getString(R.string.Favourites));
+                currentMenu = 3;
                 break;
         }
         return super.onOptionsItemSelected(item);
