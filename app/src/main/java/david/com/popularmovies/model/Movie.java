@@ -11,7 +11,6 @@ import android.os.Parcelable;
  * - implements Parcelable to allow to pass into Intent as a Movie object
  */
 
-//TODO need to implement and use in code
 public class Movie implements Parcelable {
 
     private String mTitle;

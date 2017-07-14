@@ -36,6 +36,7 @@ import david.com.popularmovies.adapters.MovieAdapter;
 import david.com.popularmovies.db.FavMoviesContract;
 import david.com.popularmovies.db.FavMoviesDbHelper;
 import david.com.popularmovies.model.Movie;
+import david.com.popularmovies.model.MovieCollection;
 import david.com.popularmovies.utils.CursorUtils;
 import david.com.popularmovies.utils.JsonUtils;
 import david.com.popularmovies.utils.NetworkUtils;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private ArrayList<Movie> newMovieList;
     //private Menu menu;
     private int currentMenu;
+    private MovieCollection mMovieCollection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         getSupportActionBar().setSubtitle(getString(R.string.Most_Popular));
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
         newMovieList = new ArrayList<>();
+        mMovieCollection = new MovieCollection();
 
         if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
             gridLayoutManager = new GridLayoutManager(this, 3);
@@ -119,9 +122,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putSerializable("movieList", newMovieList);
+        //outState.putSerializable("movieList", newMovieList);
+        outState.putParcelable("movieCollection", mMovieCollection);
         outState.putStringArray("posterPaths", posterPaths);
         outState.putInt("menu", currentMenu);
+        //outState.putSerializable("menuView", menu);
 //        byte menuState = 0;
 //        if(mMenuState == MenuState.MENU_FAV){
 //            menuState = 3;
@@ -138,19 +143,24 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        newMovieList = (ArrayList<Movie>) savedInstanceState.getSerializable("movieList");
+        //newMovieList = (ArrayList<Movie>) savedInstanceState.getSerializable("movieList");
+        mMovieCollection = (MovieCollection) savedInstanceState.getParcelable("movieCollection");
         posterPaths = savedInstanceState.getStringArray("posterPaths");
         currentMenu = savedInstanceState.getInt("menu");
         //byte menuState = savedInstanceState.getByte("menuState");
         if(currentMenu == 1){
             mMenuState = MenuState.MENU_MOST_POPULAR;
+            newMovieList = mMovieCollection.get("mostPopular");
         }else if(currentMenu == 2){
             mMenuState = MenuState.MENU_HIGHEST_RATED;
+            newMovieList = mMovieCollection.get("highestRated");
             //item.setChecked(true);
-
+            //menu.findItem(R.id.menu_highest_rated).setChecked(true);
             getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
         }else if(currentMenu == 3){
             mMenuState = MenuState.MENU_FAV;
+            newMovieList = mMovieCollection.get("favourites");
+            //menu.findItem(R.id.menu_favourites).setChecked(true);
             getSupportActionBar().setSubtitle(getString(R.string.Favourites));
         }else{
             Log.e(TAG, "error when restoring menu state in onRestoreInstanceState - no match found");
@@ -177,12 +187,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         return ((activeNetworkInfo != null) && (activeNetworkInfo.isConnected()));
     }
 
+    //TODO left off here - posterPaths in Adapter in 0. need to set the adapter before calling methods on it
     private void showMovies(){
         Log.d(TAG, "entering showMovies");
+        posterPaths = getCurrentPosterPaths(newMovieList);
         mMovieAdapter = new MovieAdapter(posterPaths, NUM_LIST_ITEMS, this);
         Log.d(TAG, "***** setting adapter *****");
         mRecyclerView.setAdapter(mMovieAdapter);
         Log.d(TAG, "exiting showMovies");
+    }
+
+    private String[] getCurrentPosterPaths(ArrayList<Movie> newMovieList) {
+        String[] currentPaths = new String[newMovieList.size()];
+        for(int i = 0; i < currentPaths.length; ++i){
+            currentPaths[i] = newMovieList.get(i).getmPosterPath();
+        }
+        return currentPaths;
     }
 
     private void loadMovieList(String sortType) {
@@ -308,6 +328,25 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if(currentMenu == 1){
+            mMenuState = MenuState.MENU_MOST_POPULAR;
+        }else if(currentMenu == 2){
+            mMenuState = MenuState.MENU_HIGHEST_RATED;
+            //item.setChecked(true);
+            menu.findItem(R.id.menu_highest_rated).setChecked(true);
+            getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
+        }else if(currentMenu == 3){
+            mMenuState = MenuState.MENU_FAV;
+            menu.findItem(R.id.menu_favourites).setChecked(true);
+            getSupportActionBar().setSubtitle(getString(R.string.Favourites));
+        }else{
+            Log.e(TAG, "error when restoring menu state in onRestoreInstanceState - no match found");
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
     private void showFavourites() {
         mMenuState = MenuState.MENU_FAV;
         txtNoNetworkMessage.setVisibility(View.INVISIBLE);
@@ -320,6 +359,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void refreshMovieList(Cursor cursor) {
         newMovieList = CursorUtils.convertCursorToArrayListOfMovie(cursor);
+        mMovieCollection.add(newMovieList, "favourites");
     }
 
     private void showHighestRated() {
@@ -414,6 +454,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                         posterPaths[next] = getString(R.string.base_poster_path) + posterPaths[next];     //other poster sizes are w92, w154, w185, w342, w500, w780 or original
                         getAllMovieData(nextMovie,  posterPaths[next]);
                         ++next;
+                    }
+                    if(mMenuState == MenuState.MENU_MOST_POPULAR){
+                        mMovieCollection.add(newMovieList, "mostPopular");
+                    }else if(mMenuState == MenuState.MENU_HIGHEST_RATED){
+                        mMovieCollection.add(newMovieList, "highestRated");
                     }
                     Log.d(TAG, "exiting onLoadFinished");
                 } else {
