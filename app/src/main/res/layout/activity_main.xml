@@ -6,14 +6,16 @@
     android:layout_height="match_parent"
     tools:context="david.com.popularmovies.app.MainActivity">
 
+
+        <!-- place your view here -->
     <TextView
+        android:id="@+id/message_no_network_connection"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/message_no_network_connection"
+        android:gravity="center"
         android:text="@string/message_no_network"
-        android:visibility="invisible"
         android:textSize="32sp"
-        android:gravity="center"/>
+        android:visibility="invisible" />
 
     <!-- TODO add dimens file for all explicit dimensions used -->
 

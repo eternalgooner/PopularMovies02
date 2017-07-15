@@ -73,7 +73,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private TextView releaseDate;
     private ImageButton mFavStar;
     protected TextView movieSummary;
-    private LinearLayout linearLayout;
+    //private LinearLayout linearLayout;
     private ExpandableTextView expandableTextView;
     private boolean mIsFavourite;
     private String[] videoKeys;
@@ -90,12 +90,14 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private static final int THE_MOVIE_DB_TRAILER_LOADER = 61;
     private static final int INSERT_ACTION = 1;
     private static final int DELETE_ACTION = -1;
-    private MainActivity.MenuState cameFromMenuState;
+    //private MainActivity.MenuState cameFromMenuState;
+    private int currentMenu = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "entering onCreate");
+
         setContentView(R.layout.activity_movie_details);
 
         ActionBar actionBar = getSupportActionBar();
@@ -107,22 +109,27 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         releaseDate = (TextView) findViewById(R.id.txtMovieReleaseDate);
         movieSummary = (TextView) findViewById(R.id.txtMovieSummary);
         mFavStar = (ImageButton) findViewById(R.id.imgFavStar);
-        linearLayout = (LinearLayout) findViewById(R.id.ll_play_trailer);
+        //linearLayout = (LinearLayout) findViewById(R.id.ll_play_trailer);
         expandableTextView = (ExpandableTextView) findViewById(R.id.expandable_text_view);
         listTrailerView = (ExpandableListView) findViewById(R.id.expLV);
 
         bundle = this.getIntent().getExtras();
         selectedMovie = getIntent().getExtras().getParcelable(getString(R.string.selectedMovie));
-        mIsFavourite = bundle.getBoolean("isFav");
-        cameFromMenuState = (MainActivity.MenuState) bundle.get("menuState");
-        Log.d(TAG, "came from menu state: " + cameFromMenuState);
+        if(savedInstanceState != null){
+            mIsFavourite = savedInstanceState.getBoolean(getString(R.string.isFav));
+        }else {
+            mIsFavourite = bundle.getBoolean("isFav");
+        }
+
+        //cameFromMenuState = (MainActivity.MenuState) bundle.get(getApplicationContext().getString(R.string.menuState));
+        currentMenu = getIntent().getIntExtra("currentMenu", 5);
+        Log.d(TAG, "came from menu state: " + currentMenu);
 
         if(isNetworkAvailable() && !mIsFavourite){
             Log.d("TAG --- +++", "newtowrk is available & movie is not a FAV ");
             loadMovieReview("reviews");
             getTrailerData("videos");
         }else{
-            //TODO txtNoNetworkMessage.setVisibility(View.VISIBLE);
             Log.d("TAG --- +++", "MOVIE IS FAV");
             loadLocalMovieData();
         }
@@ -148,7 +155,11 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         Log.d(TAG, "exiting onCreate");
     }
 
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(getString(R.string.isFav), mIsFavourite);
+    }
 
     private void playTrailer(String trailerId) {
         Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailerId));
@@ -243,11 +254,14 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         userRating.setText(movie.getmRating() + "/10");
         releaseDate.setText(year);
         if(!mIsFavourite){
+            Log.d(TAG, "in displayMovieDetails(), setting real image as poster - not a FAV");
             Picasso.with(getApplicationContext()).load(movie.getmPosterPath()).into(moviePoster);
         }else{
-            if(cameFromMenuState != MainActivity.MenuState.MENU_FAV){
+            if(currentMenu != 3){
+                Log.d(TAG, "in displayMovieDetails(), setting real image as poster - FAV from real menu");
                 Picasso.with(getApplicationContext()).load(movie.getmPosterPath()).into(moviePoster);
             }else {
+                Log.d(TAG, "in displayMovieDetails(), setting default image as poster");
                 moviePoster.setPadding(24, 224, 24, 24);
                 moviePoster.setImageResource(R.mipmap.movie_projector);
             }

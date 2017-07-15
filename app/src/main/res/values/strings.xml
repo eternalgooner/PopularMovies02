@@ -1,8 +1,8 @@
 <resources>
 
     <!-- menu options -->
-    <string name="most_popular">Most popular</string>
-    <string name="highest_rated">Highest rated</string>
+    <string name="most_popular">Most Popular</string>
+    <string name="highest_rated">Highest Rated</string>
 
     <!-- image content desriptions -->
     <string name="movie_poster_image_content_description">movie poster image</string>
@@ -40,6 +40,7 @@
     <string name="results">results</string>
     <string name="poster_path">poster_path</string>
     <string name="base_poster_path">https://image.tmdb.org/t/p/w500/</string>
+    <string name="favourites">favourites</string>
 
 
 </resources>
