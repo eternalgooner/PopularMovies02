@@ -85,68 +85,111 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public enum MenuState {MENU_MOST_POPULAR, MENU_HIGHEST_RATED, MENU_FAV}
     private MenuState mMenuState = MenuState.MENU_MOST_POPULAR;
     private ArrayList<Movie> newMovieList;
-    private int currentMenu;
+    private int currentMenu = 1;
     private MovieCollection mMovieCollection;
     private Cursor mCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "entering onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        getSupportActionBar().setSubtitle(getString(R.string.Most_Popular));
+        Log.d(TAG, "entering onCreate");
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
-        newMovieList = new ArrayList<>();
-        mMovieCollection = new MovieCollection();
+        if(savedInstanceState == null){
 
-        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            gridLayoutManager = new GridLayoutManager(this, 3);
+            //super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+            getSupportActionBar().setSubtitle(getString(R.string.Most_Popular));
+            mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
+            newMovieList = new ArrayList<>();
+            mMovieCollection = new MovieCollection();
+
+            if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                gridLayoutManager = new GridLayoutManager(this, 3);
+            } else {
+                gridLayoutManager = new GridLayoutManager(this, 4);
+            }
+            mRecyclerView.setLayoutManager(gridLayoutManager);
+            txtNoNetworkMessage = (TextView) findViewById(R.id.message_no_network_connection);
+
+            if (isNetworkAvailable()) {
+                loadMovieList(getString(R.string.mostPopular));
+            } else {
+                txtNoNetworkMessage.setVisibility(View.VISIBLE);
+            }
+
+            FavMoviesDbHelper dbHelper = new FavMoviesDbHelper(this);
+            mDb = dbHelper.getReadableDatabase();
+
         }else{
-            gridLayoutManager = new GridLayoutManager(this, 4);
-        }
-        mRecyclerView.setLayoutManager(gridLayoutManager);
-        txtNoNetworkMessage = (TextView) findViewById(R.id.message_no_network_connection);
+            setContentView(R.layout.activity_main);
+            //super.onCreate(savedInstanceState);
+            mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
+            mMovieCollection = (MovieCollection) savedInstanceState.getParcelable("movieCollection");
+            posterPaths = savedInstanceState.getStringArray("posterPaths");
+            currentMenu = savedInstanceState.getInt("menu");
+            txtNoNetworkMessage = (TextView) findViewById(R.id.message_no_network_connection);
+            if(currentMenu == 1){
+                Log.e(TAG, "in onCreate() and currentMenu is: " + currentMenu);
+                mMenuState = MenuState.MENU_MOST_POPULAR;
+                newMovieList = mMovieCollection.getMostPopular();
+            }else if(currentMenu == 2){
+                Log.e(TAG, "in onCreate() and currentMenu is: " + currentMenu);
+                mMenuState = MenuState.MENU_HIGHEST_RATED;
+                newMovieList = mMovieCollection.getHighestRated();
+                getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
+            }else if(currentMenu == 3){
+                Log.e(TAG, "in onCreate() and currentMenu is: " + currentMenu);
+                mMenuState = MenuState.MENU_FAV;
+                newMovieList = mMovieCollection.getFavourites();
+                getSupportActionBar().setSubtitle(getString(R.string.Favourites));
+            }else{
+                Log.e(TAG, "error when restoring menu state in onRestoreInstanceState - no match found, currentMenu is: " + currentMenu);
+            }
 
-        if(isNetworkAvailable()){
-            loadMovieList(getString(R.string.mostPopular));
-        }else{
-            txtNoNetworkMessage.setVisibility(View.VISIBLE);
+            if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                gridLayoutManager = new GridLayoutManager(this, 3);
+            } else {
+                gridLayoutManager = new GridLayoutManager(this, 4);
+            }
+            mRecyclerView.setLayoutManager(gridLayoutManager);
+            showMovies();
         }
 
-        FavMoviesDbHelper dbHelper = new FavMoviesDbHelper(this);
-        mDb = dbHelper.getReadableDatabase();
         Log.d(TAG, "exiting onCreate");
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG, "entering onSaveInstanceState()");
         super.onSaveInstanceState(outState);
         outState.putParcelable("movieCollection", mMovieCollection);
         outState.putStringArray("posterPaths", posterPaths);
+        Log.d(TAG, "in onSaveInstanceState(), currentMenu is: " + currentMenu);
         outState.putInt("menu", currentMenu);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.d(TAG, "entering onRestoreInstanceState()");
         super.onRestoreInstanceState(savedInstanceState);
-        mMovieCollection = (MovieCollection) savedInstanceState.getParcelable("movieCollection");
-        posterPaths = savedInstanceState.getStringArray("posterPaths");
-        currentMenu = savedInstanceState.getInt("menu");
-        if(currentMenu == 1){
-            mMenuState = MenuState.MENU_MOST_POPULAR;
-            newMovieList = mMovieCollection.getMostPopular();
-        }else if(currentMenu == 2){
-            mMenuState = MenuState.MENU_HIGHEST_RATED;
-            newMovieList = mMovieCollection.getHighestRated();
-            getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
-        }else if(currentMenu == 3){
-            mMenuState = MenuState.MENU_FAV;
-            newMovieList = mMovieCollection.getFavourites();
-            getSupportActionBar().setSubtitle(getString(R.string.Favourites));
-        }else{
-            Log.e(TAG, "error when restoring menu state in onRestoreInstanceState - no match found");
-        }
-        showMovies();
+//        mMovieCollection = (MovieCollection) savedInstanceState.getParcelable("movieCollection");
+//        posterPaths = savedInstanceState.getStringArray("posterPaths");
+//        currentMenu = savedInstanceState.getInt("menu");
+//        if(currentMenu == 1){
+//            mMenuState = MenuState.MENU_MOST_POPULAR;
+//            newMovieList = mMovieCollection.getMostPopular();
+//        }else if(currentMenu == 2){
+//            mMenuState = MenuState.MENU_HIGHEST_RATED;
+//            newMovieList = mMovieCollection.getHighestRated();
+//            getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
+//        }else if(currentMenu == 3){
+//            mMenuState = MenuState.MENU_FAV;
+//            newMovieList = mMovieCollection.getFavourites();
+//            getSupportActionBar().setSubtitle(getString(R.string.Favourites));
+//        }else{
+//            Log.e(TAG, "error when restoring menu state in onRestoreInstanceState - no match found");
+//        }
+//        showMovies();
     }
 
 
@@ -167,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         return ((activeNetworkInfo != null) && (activeNetworkInfo.isConnected()));
     }
 
-    //TODO left off here - fav list showing fav + most popular (24)!
+    //TODO left off here - favs need to talk to DB all the time to get correct data - if delete item and go back, not refreshing
     private void showMovies(){
         Log.d(TAG, "entering showMovies");
         posterPaths = getCurrentPosterPaths(newMovieList);
