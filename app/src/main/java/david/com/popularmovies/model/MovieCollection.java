@@ -51,6 +51,30 @@ public class MovieCollection implements Parcelable{
         return (ArrayList) movieCollection.get(movieList);
     }
 
+    public ArrayList getMostPopular(){
+        return (ArrayList) movieCollection.get("mostPopular");
+    }
+
+    public ArrayList getHighestRated(){
+        return (ArrayList) movieCollection.get("highestRated");
+    }
+
+    public ArrayList getFavourites(){
+        return (ArrayList) movieCollection.get("favourites");
+    }
+
+    public void setMostPopular(List mostPopular){
+        movieCollection.put("mostPopular", mostPopular);
+    }
+
+    public void setHighestRated(List highestRated){
+        movieCollection.put("highestRated", highestRated);
+    }
+
+    public void setFavourites(List favourites){
+        movieCollection.put("favourites", favourites);
+    }
+
     @Override
     public int describeContents() {
         return 0;

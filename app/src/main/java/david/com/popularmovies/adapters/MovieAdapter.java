@@ -14,8 +14,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 import david.com.popularmovies.R;
 import david.com.popularmovies.db.FavMoviesContract;
+import david.com.popularmovies.model.Movie;
 
 /**
  * Created by David on 13-May-17.
@@ -38,6 +41,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     private String[] mPosterPaths;
     private Cursor mCursor;
     private boolean isFavAdapter;
+    private ArrayList<Movie> mMovieList;
 
     public MovieAdapter(String[] posterPaths, int numItems, ListItemClickListener clickListener){
         mNumItems = numItems;
@@ -46,10 +50,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         isFavAdapter = false;
     }
 
-    public MovieAdapter(Context context, Cursor cursor, ListItemClickListener clickListener){
+    public MovieAdapter(Context context, Cursor cursor, ListItemClickListener clickListener, String[] posterPaths){
         mNumItems = cursor.getCount();
+        mPosterPaths = posterPaths;
         this.context = context;
         mCursor = cursor;
+        isFavAdapter = true;
+        onClickListener = clickListener;
+    }
+
+    public MovieAdapter(ArrayList<Movie> newMovieList, String[] posterPaths, Context context, ListItemClickListener clickListener) {
+        mNumItems = posterPaths.length;
+        mMovieList = newMovieList;
+        mPosterPaths = posterPaths;
+        this.context = context;
         isFavAdapter = true;
         onClickListener = clickListener;
     }
@@ -76,27 +90,42 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
-        Log.d(TAG, "entering onBindViewHolder");
+        Log.d(TAG, "entering onBindViewHolder. Position is: " + position + ", isFavAdapter ==  " + isFavAdapter);
 
         if(!isFavAdapter){
             Log.d(TAG, mPosterPaths[position]);
             Picasso.with(context).load(mPosterPaths[position]).into(holder.mImageView);
         }else if(isFavAdapter){
-            if(!mCursor.moveToPosition(position)){
-                return;
+            if(mCursor == null){
+//                String title = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_TITLE));
+//                String rating = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_RATING));
+//                String year = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_YEAR));
+//                String summary = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY));
+//                String trailer = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER));
+//                String review = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW));
+//
+//                Log.d(TAG, "all details retrieved from DB are: " + title + " : " + rating + " : " + year + " : " + summary + " : " + trailer + " : " + review);
+
+                holder.mFavImageView.setImageResource(R.mipmap.movie_projector);
+                holder.mTextView.setText(mMovieList.get(position).getmTitle());
+                holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
+            }else{
+                if(!mCursor.moveToPosition(position)){
+                    return;
+                }
+                String title = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_TITLE));
+                String rating = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_RATING));
+                String year = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_YEAR));
+                String summary = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY));
+                String trailer = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER));
+                String review = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW));
+
+                Log.d(TAG, "all details retrieved from DB are: " + title + " : " + rating + " : " + year + " : " + summary + " : " + trailer + " : " + review);
+
+                holder.mFavImageView.setImageResource(R.mipmap.movie_projector);
+                holder.mTextView.setText(title);
+                holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
             }
-            String title = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_TITLE));
-            String rating = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_RATING));
-            String year = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_YEAR));
-            String summary = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY));
-            String trailer = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER));
-            String review = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW));
-
-            Log.d(TAG, "all details retrieved from DB are: " + title + " : " + rating + " : " + year + " : " + summary + " : " + trailer + " : " + review);
-
-            holder.mFavImageView.setImageResource(R.mipmap.movie_projector);
-            holder.mTextView.setText(title);
-            holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
         }
 
         Log.d(TAG, "exiting onBindViewHolder");
@@ -105,8 +134,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     @Override
     public int getItemCount() {
         if(isFavAdapter){
-            Log.d(TAG, "entering getItemCount in fav adapater. itemCount is: " + mCursor.getCount());
-            return mCursor.getCount();
+            Log.d(TAG, "entering getItemCount in fav adapater. itemCount is: " + mNumItems);
+            return mNumItems
+                    ;
         }else{
             Log.d(TAG, "entering getItemCount in normal adapater. itemCount is: " + mPosterPaths.length);
             return mNumItems;
