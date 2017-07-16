@@ -97,15 +97,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             Picasso.with(context).load(mPosterPaths[position]).into(holder.mImageView);
         }else if(isFavAdapter){
             if(mCursor == null){
-//                String title = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_TITLE));
-//                String rating = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_RATING));
-//                String year = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_YEAR));
-//                String summary = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY));
-//                String trailer = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER));
-//                String review = mCursor.getString(mCursor.getColumnIndex(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW));
-//
-//                Log.d(TAG, "all details retrieved from DB are: " + title + " : " + rating + " : " + year + " : " + summary + " : " + trailer + " : " + review);
-
                 holder.mFavImageView.setImageResource(R.mipmap.movie_projector);
                 holder.mTextView.setText(mMovieList.get(position).getmTitle());
                 holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
@@ -127,7 +118,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
                 holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
             }
         }
-
         Log.d(TAG, "exiting onBindViewHolder");
     }
 
@@ -135,8 +125,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     public int getItemCount() {
         if(isFavAdapter){
             Log.d(TAG, "entering getItemCount in fav adapater. itemCount is: " + mNumItems);
-            return mNumItems
-                    ;
+            return mNumItems;
         }else{
             Log.d(TAG, "entering getItemCount in normal adapater. itemCount is: " + mPosterPaths.length);
             return mNumItems;
@@ -150,14 +139,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
         public MovieAdapterViewHolder(View itemView) {
             super(itemView);
-
             if(!isFavAdapter){
                 mImageView = (ImageView) itemView.findViewById(R.id.item_imageView);
             }else if(isFavAdapter){
                 mFavImageView = (ImageView) itemView.findViewById(R.id.fav_layout_img);
                 mTextView = (TextView) itemView.findViewById(R.id.fav_layout_txt);
             }
-
             itemView.setOnClickListener(this);
         }
 

@@ -22,15 +22,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> listDataHeader;
     private HashMap<String, List<String>> listHashMap;
+    private static int INCREMENT_TO_START_AT_ONE = 1;
     private static final String TAG = ExpandableListAdapter.class.getSimpleName();
 
     public ExpandableListAdapter(Context context, List<String> listDataHeader, HashMap<String, List<String>> listHashMap) {
         this.context = context;
         this.listDataHeader = listDataHeader;
         this.listHashMap = listHashMap;
-
-        //Log.d(TAG, Arrays.toString(listHashMap.get(0).toArray()));
-
         Log.d(TAG, "in constructor, listDataHeader size is: " + this.listDataHeader.size() + " & includes: " + this.listDataHeader.get(0) + "  ....and listHashMap size is " + this.listHashMap.get(listDataHeader.get(0)).size() + "...and includes " + Arrays.toString(this.listHashMap.get(listDataHeader.get(0)).toArray()));
     }
 
@@ -92,7 +90,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         Log.d(TAG, "in getChildView returning VIEW");
-        final String childText = (String) (String.valueOf(childPosition + 1));
+        final String childText = (String) (String.valueOf(childPosition + INCREMENT_TO_START_AT_ONE));
         if(convertView == null){
             LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.list_trailer_item, null);

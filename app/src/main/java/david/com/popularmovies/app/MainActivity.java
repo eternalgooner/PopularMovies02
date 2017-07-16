@@ -72,7 +72,7 @@ import david.com.popularmovies.utils.NetworkUtils;
  * you need to supply your own API key to retrieve data from themoviedb (API key is used in NetworkUtils class)
  */
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener, LoaderManager.LoaderCallbacks<String>, SwipeRefreshLayout.OnRefreshListener{
+public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener, LoaderManager.LoaderCallbacks<String>{
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private TextView txtNoNetworkMessage;
@@ -91,6 +91,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private int currentMenu = 1;
     private MovieCollection mMovieCollection;
     private Cursor mCursor;
+    private static final int PORTRAIT_MODE = 3;
+    private static final int LANDSCAPE_MODE = 4;
+    private static final int MOST_POPULAR_MENU = 1;
+    private static final int HIGHEST_RATED_MENU = 2;
+    private static final int FAVOURITES_MENU = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +105,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         //if null - load for the first time
         if(savedInstanceState == null){
-
-            //super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
             getSupportActionBar().setSubtitle(getString(R.string.Most_Popular));
             mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
@@ -109,9 +112,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             mMovieCollection = new MovieCollection(getApplicationContext());
 
             if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                gridLayoutManager = new GridLayoutManager(this, 3);
+                gridLayoutManager = new GridLayoutManager(this, PORTRAIT_MODE);
             } else {
-                gridLayoutManager = new GridLayoutManager(this, 4);
+                gridLayoutManager = new GridLayoutManager(this, LANDSCAPE_MODE);
             }
             mRecyclerView.setLayoutManager(gridLayoutManager);
             txtNoNetworkMessage = (TextView) findViewById(R.id.message_no_network_connection);
@@ -127,23 +130,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         }else{
             //else load from savedInstanceState
             setContentView(R.layout.activity_main);
-            //super.onCreate(savedInstanceState);
             mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
-            mMovieCollection = (MovieCollection) savedInstanceState.getParcelable("movieCollection");
-            posterPaths = savedInstanceState.getStringArray("posterPaths");
-            currentMenu = savedInstanceState.getInt("menu");
+            mMovieCollection = (MovieCollection) savedInstanceState.getParcelable(getString(R.string.movieCollection));
+            posterPaths = savedInstanceState.getStringArray(getString(R.string.posterPaths));
+            currentMenu = savedInstanceState.getInt(getString(R.string.menu));
             txtNoNetworkMessage = (TextView) findViewById(R.id.message_no_network_connection);
-            if(currentMenu == 1){
+            if(currentMenu == MOST_POPULAR_MENU){
                 Log.e(TAG, "in onCreate() and currentMenu is: " + currentMenu);
                 mMenuState = MenuState.MENU_MOST_POPULAR;
                 newMovieList = mMovieCollection.getMostPopular();
                 getSupportActionBar().setSubtitle(getString(R.string.Most_Popular));
-            }else if(currentMenu == 2){
+            }else if(currentMenu == HIGHEST_RATED_MENU){
                 Log.e(TAG, "in onCreate() and currentMenu is: " + currentMenu);
                 mMenuState = MenuState.MENU_HIGHEST_RATED;
                 newMovieList = mMovieCollection.getHighestRated();
                 getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
-            }else if(currentMenu == 3){
+            }else if(currentMenu == FAVOURITES_MENU){
                 Log.e(TAG, "in onCreate() and currentMenu is: " + currentMenu);
                 mMenuState = MenuState.MENU_FAV;
                 newMovieList = mMovieCollection.getFavourites();
@@ -153,9 +155,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             }
 
             if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                gridLayoutManager = new GridLayoutManager(this, 3);
+                gridLayoutManager = new GridLayoutManager(this, PORTRAIT_MODE);
             } else {
-                gridLayoutManager = new GridLayoutManager(this, 4);
+                gridLayoutManager = new GridLayoutManager(this, LANDSCAPE_MODE);
             }
             mRecyclerView.setLayoutManager(gridLayoutManager);
             showMovies();
@@ -168,28 +170,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(TAG, "entering onSaveInstanceState()");
         super.onSaveInstanceState(outState);
-        outState.putParcelable("movieCollection", mMovieCollection);
-        outState.putStringArray("posterPaths", posterPaths);
+        outState.putParcelable(getString(R.string.movieCollection), mMovieCollection);
+        outState.putStringArray(getString(R.string.posterPaths), posterPaths);
         Log.d(TAG, "in onSaveInstanceState(), currentMenu is: " + currentMenu);
-        outState.putInt("menu", currentMenu);
+        outState.putInt(getString(R.string.menu), currentMenu);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         Log.d(TAG, "entering onRestoreInstanceState()");
         super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    @Override
-    public void onRefresh() {
-        Log.d(TAG, "entering onRefresh(), from swipe down");
-        if(isNetworkAvailable()){
-            if(currentMenu == 1){
-                loadMovieList(getString(R.string.mostPopular));
-            }else if(currentMenu == 2){
-                loadMovieList(getString(R.string.highestRated));
-            }
-        }
     }
 
     @Override
@@ -208,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         return ((activeNetworkInfo != null) && (activeNetworkInfo.isConnected()));
     }
 
-    //TODO left off here - favs need to talk to DB all the time to get correct data - if delete item and go back, not refreshing
     private void showMovies(){
         Log.d(TAG, "entering showMovies");
         posterPaths = getCurrentPosterPaths(newMovieList);
@@ -222,7 +211,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 Log.d(TAG, "in showMovies for FAV, cursor is NOT null");
                 mMovieAdapter = new MovieAdapter(getApplicationContext(), mCursor, this, posterPaths);
             }
-            //showFavourites();
         }
         Log.d(TAG, "***** setting adapter *****");
         mRecyclerView.setAdapter(mMovieAdapter);
@@ -239,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void loadMovieList(String sortType) {
         Log.d(TAG, "entering loadMovieList for " + sortType);
-        URL myUrl = NetworkUtils.buildUrl(sortType, getApplicationContext(), getString(R.string.default_id));      //TODO "0" needs to be changed to get the ID of the movie, used for getting reviews & trailers for movie
+        URL myUrl = NetworkUtils.buildUrl(sortType, getApplicationContext(), getString(R.string.default_id));
 
         Bundle queryBundle = new Bundle();
         queryBundle.putString(getString(R.string.theMovieDb) + sortType + getString(R.string.Query), myUrl.toString());
@@ -262,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
 
         if(mMenuState == MenuState.MENU_FAV){
-            Movie selectedFavMovie = null;
+            Movie selectedFavMovie;
             Cursor cursor = getClickedMovieData(clickedItem);
 
             Log.e("cursor count is: ", cursor.getCount()+getString(R.string.emptyString));
@@ -278,14 +266,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 Log.e("debug cursor", cursor.getString(8));
             }
             selectedFavMovie = CursorUtils.convertCursorToMovieObject(cursor);
-            intent.putExtra("currentMenu", currentMenu);
+            intent.putExtra(getString(R.string.currentMenu), currentMenu);
             intent.putExtra(getString(R.string.selectedMovie), selectedFavMovie);
             movieBundle.putBoolean(getString(R.string.isFav), true);
-            //cursor.close();
         }else{
             intent.putExtra(getString(R.string.selectedMovie), newMovieList.get(clickedItem));
-            //intent.putExtra(getString(R.string.menuState), mMenuState);
-            intent.putExtra("currentMenu", currentMenu);
+            intent.putExtra(getString(R.string.currentMenu), currentMenu);
             Log.e(TAG, "add movie here into intent. Movie poster path is " + newMovieList.get(clickedItem).getmPosterPath());
             boolean isFav = checkIfMovieIsAlreadyInFavourites(clickedItem);
             movieBundle.putBoolean(getString(R.string.isFav), isFav);
@@ -306,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private Cursor getClickedMovieData(int clickedItem) {
-        String[] selectedMovie = { newMovieList.get(clickedItem).getmMovieId()+""};
+        String[] selectedMovie = { newMovieList.get(clickedItem).getmMovieId() + getString(R.string.emptyString)};
         try{
             Uri uri = FavMoviesContract.FavMovieEntry.CONTENT_URI;
             uri = uri.buildUpon().appendPath(selectedMovie[0]).build();
@@ -342,19 +328,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 if(mMenuState != MenuState.MENU_MOST_POPULAR) showMostPopular();
                 item.setChecked(true);
                 getSupportActionBar().setSubtitle(getString(R.string.most_popular));
-                currentMenu = 1;
+                currentMenu = MOST_POPULAR_MENU;
                 break;
             case R.id.menu_highest_rated:
                 if(mMenuState != MenuState.MENU_HIGHEST_RATED) showHighestRated();
                 item.setChecked(true);
                 getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
-                currentMenu = 2;
+                currentMenu = HIGHEST_RATED_MENU;
                 break;
             case R.id.menu_favourites:
                 showFavourites();
                 item.setChecked(true);
                 getSupportActionBar().setSubtitle(getString(R.string.Favourites));
-                currentMenu = 3;
+                currentMenu = FAVOURITES_MENU;
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -362,13 +348,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(currentMenu == 1){
+        if(currentMenu == MOST_POPULAR_MENU){
             mMenuState = MenuState.MENU_MOST_POPULAR;
-        }else if(currentMenu == 2){
+        }else if(currentMenu == HIGHEST_RATED_MENU){
             mMenuState = MenuState.MENU_HIGHEST_RATED;
             menu.findItem(R.id.menu_highest_rated).setChecked(true);
             getSupportActionBar().setSubtitle(getString(R.string.highest_rated));
-        }else if(currentMenu == 3){
+        }else if(currentMenu == FAVOURITES_MENU){
             mMenuState = MenuState.MENU_FAV;
             menu.findItem(R.id.menu_favourites).setChecked(true);
             getSupportActionBar().setSubtitle(getString(R.string.Favourites));
@@ -381,14 +367,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private void showFavourites() {
         mMenuState = MenuState.MENU_FAV;
         txtNoNetworkMessage.setVisibility(View.INVISIBLE);
-//        if(mMovieCollection.getFavourites() == null){
-//            mCursor = getAllFavMovies();
-//            refreshMovieList(mCursor);
-//            mMovieAdapter = new MovieAdapter(this, mCursor, this, getCurrentPosterPaths(newMovieList));
-//            mRecyclerView.setAdapter(mMovieAdapter);
-//        }else if(mMovieCollection.getFavourites() != null){
-//            loadCachedCollection("favourites");
-//        }
         mCursor = getAllFavMovies();
         refreshMovieList(mCursor);
         mMovieAdapter = new MovieAdapter(this, mCursor, this, getCurrentPosterPaths(newMovieList));
@@ -409,10 +387,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             loadMovieList(getString(R.string.highestRated));
         }else if(mMovieCollection.getHighestRated() != null && isNetworkAvailable()){
             txtNoNetworkMessage.setVisibility(View.INVISIBLE);
-            loadCachedCollection("highestRated");
+            loadCachedCollection(getString(R.string.highestRated));
         }else if(mMovieCollection.getHighestRated() != null){
             txtNoNetworkMessage.setVisibility(View.INVISIBLE);
-            loadCachedCollection("highestRated");
+            loadCachedCollection(getString(R.string.highestRated));
         }else{
             txtNoNetworkMessage.setVisibility(View.VISIBLE);
             mRecyclerView.setAdapter(null);
@@ -421,17 +399,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void loadCachedCollection(String sortType) {
         Log.d(TAG, "entering loadCachedCollection() with sortType: " + sortType);
-        if(sortType.equals("mostPopular")){
+        if(sortType.equals(getString(R.string.mostPopular))){
             Log.d(TAG, "load most popular cache");
             newMovieList = mMovieCollection.getMostPopular();
             posterPaths = getCurrentPosterPaths(newMovieList);
             showMovies();
-        }else if(sortType.equals("highestRated")){
+        }else if(sortType.equals(getString(R.string.highestRated))){
             Log.d(TAG, "load highest rated cache");
             newMovieList = mMovieCollection.getHighestRated();
             posterPaths = getCurrentPosterPaths(newMovieList);
             showMovies();
-        }else if(sortType.equals("favourites")){
+        }else if(sortType.equals(getString(R.string.favourites))){
             Log.d(TAG, "load favourites cache");
             newMovieList = mMovieCollection.getFavourites();
             posterPaths = getCurrentPosterPaths(newMovieList);
@@ -450,11 +428,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         }else if(mMovieCollection.getMostPopular() != null && isNetworkAvailable()){
             txtNoNetworkMessage.setVisibility(View.INVISIBLE);
             Log.d(TAG, "in showMostPopular() - 2nd if true");
-            loadCachedCollection("mostPopular");
+            loadCachedCollection(getString(R.string.mostPopular));
         }else if(mMovieCollection.getMostPopular() != null){
             txtNoNetworkMessage.setVisibility(View.INVISIBLE);
             Log.d(TAG, "in showMostPopular() - 3rd if true");
-            loadCachedCollection("mostPopular");
+            loadCachedCollection(getString(R.string.mostPopular));
         }else{
             Log.d(TAG, "in showMostPopular() - 4th if true");
             txtNoNetworkMessage.setVisibility(View.VISIBLE);
@@ -533,10 +511,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                         ++next;
                     }
                     if(mMenuState == MenuState.MENU_MOST_POPULAR){
-                        //mMovieCollection.add(newMovieList, "mostPopular");
                         mMovieCollection.setMostPopular(newMovieList);
                     }else if(mMenuState == MenuState.MENU_HIGHEST_RATED){
-                        //mMovieCollection.add(newMovieList, "highestRated");
                         mMovieCollection.setHighestRated(newMovieList);
                     }
                     Log.d(TAG, "exiting onLoadFinished");
@@ -548,13 +524,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             //TODO finished off here. need to set no review string for movies in first 2 lists - working for fav list
             private void getAllMovieData(JSONObject clickedMovie, String posterPath) {
                 Log.d(TAG, "ATL entering getAllMovieData");
-                Movie movie = new Movie(JsonUtils.getString(clickedMovie, "original_title"),
-                                        JsonUtils.getString(clickedMovie, "vote_average"),
-                                        JsonUtils.getString(clickedMovie, "release_date"),
-                                        JsonUtils.getString(clickedMovie, "overview"),
-                                        "no trailers",          //TODO check this, maybe set as null? otherwise always showing one trailer, but won't load if really no trailer
-                                        "no reviews yet",
-                                        JsonUtils.getString(clickedMovie, "id"),
+                Movie movie = new Movie(JsonUtils.getString(clickedMovie, getString(R.string.original_title)),
+                                        JsonUtils.getString(clickedMovie, getString(R.string.vote_average)),
+                                        JsonUtils.getString(clickedMovie, getString(R.string.release_date)),
+                                        JsonUtils.getString(clickedMovie, getString(R.string.overview)),
+                                        getString(R.string.noTrailers),          //TODO check this, maybe set as null? otherwise always showing one trailer, but won't load if really no trailer
+                                        getString(R.string.noReviewsYet),
+                                        JsonUtils.getString(clickedMovie, getString(R.string.id)),
                                         posterPath);
                 newMovieList.add(movie);
                 Log.d(TAG, "ATL exiting getAllMovieData");
