@@ -521,14 +521,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 }
             }
 
-            //TODO finished off here. need to set no review string for movies in first 2 lists - working for fav list
             private void getAllMovieData(JSONObject clickedMovie, String posterPath) {
                 Log.d(TAG, "ATL entering getAllMovieData");
                 Movie movie = new Movie(JsonUtils.getString(clickedMovie, getString(R.string.original_title)),
                                         JsonUtils.getString(clickedMovie, getString(R.string.vote_average)),
                                         JsonUtils.getString(clickedMovie, getString(R.string.release_date)),
                                         JsonUtils.getString(clickedMovie, getString(R.string.overview)),
-                                        getString(R.string.noTrailers),          //TODO check this, maybe set as null? otherwise always showing one trailer, but won't load if really no trailer
+                                        getString(R.string.noTrailers),
                                         getString(R.string.noReviewsYet),
                                         JsonUtils.getString(clickedMovie, getString(R.string.id)),
                                         posterPath);
