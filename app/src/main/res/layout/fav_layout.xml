@@ -13,8 +13,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/fav_layout_img"
-            android:paddingLeft="18dp"
-            android:layout_margin="4dp"
+            android:paddingLeft="@dimen/fav_layout_padding_left"
+            android:layout_margin="@dimen/fav_layout_margin"
             />
 
         <TextView
@@ -22,10 +22,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:padding="8dp"
-            android:layout_margin="4dp"
+            android:padding="@dimen/fav_layout_padding"
+            android:layout_margin="@dimen/fav_layout_text_margin"
             android:textAlignment="center"
-            android:textSize="18sp"
+            android:textSize="@dimen/fav_layout_text_size"
             android:textStyle="bold"
             tools:text="movie title" />
 

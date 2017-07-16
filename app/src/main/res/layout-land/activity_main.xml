@@ -12,7 +12,7 @@
         android:id="@+id/message_no_network_connection"
         android:text="@string/message_no_network"
         android:visibility="invisible"
-        android:textSize="32sp"
+        android:textSize="@dimen/no_network_message"
         android:gravity="center"/>
 
     <android.support.v7.widget.RecyclerView

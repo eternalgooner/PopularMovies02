@@ -40,7 +40,7 @@ public class JsonUtils {
     }
 
     public static String getString(JSONObject object, String key){
-        String result = "";
+        String result = null;
         try {
             result = object.getString(key);
         } catch (JSONException e) {

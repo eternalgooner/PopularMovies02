@@ -17,11 +17,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorAccent"
-            android:elevation="4dp"
+            android:elevation="@dimen/standard_card_elevation"
             android:gravity="center"
-            android:padding="16dp"
+            android:padding="@dimen/title_padding"
             android:textAlignment="center"
-            android:textSize="32sp"
+            android:textSize="@dimen/title_text_size"
             tools:text="Super Man 2" />
 
         <android.support.v7.widget.CardView
@@ -44,8 +44,8 @@
                         android:id="@+id/imgMoviePoster"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp"
+                        android:paddingTop="@dimen/poster_padding"
+                        android:paddingBottom="@dimen/poster_padding"
                         android:contentDescription="@string/movie_poster_image_content_description" />
 
                 </LinearLayout>
@@ -61,11 +61,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:textSize="48sp"
-                        android:paddingTop="20dp"
-                        android:paddingLeft="8dp"
-                        android:paddingRight="8dp"
-                        android:paddingBottom="8dp"
+                        android:textSize="@dimen/user_rating_text_size"
+                        android:paddingTop="@dimen/user_rating_top_padding"
+                        android:paddingLeft="@dimen/user_rating_standard_padding"
+                        android:paddingRight="@dimen/user_rating_standard_padding"
+                        android:paddingBottom="@dimen/user_rating_standard_padding"
                         android:textStyle="bold"
                         tools:text="7.8/10" />
 
@@ -74,8 +74,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:textSize="32sp"
-                        android:padding="8dp"
+                        android:textSize="@dimen/release_date_text_size"
+                        android:padding="@dimen/release_date_padding"
                         android:textStyle="italic"
                         tools:text="2017" />
 
@@ -85,13 +85,13 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="1hr 30m"
-                        android:padding="8dp"
-                        android:textSize="22sp"
+                        android:padding="@dimen/movie_duration_padding"
+                        android:textSize="@dimen/movie_duration_text_size"
                         tools:text="1hr 30m" />
 
                     <ImageButton
                         android:id="@+id/imgFavStar"
-                        android:padding="8dp"
+                        android:padding="@dimen/fav_star_padding"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@null" />
@@ -105,8 +105,8 @@
             android:id="@+id/cv_summary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            app:cardElevation="2dp">
+            android:layout_marginTop="@dimen/summary_margin_top"
+            app:cardElevation="@dimen/summary_card_elevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -116,7 +116,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
+                    android:padding="@dimen/summary_padding"
                     android:text="Summary"
                     android:textAppearance="@style/TextAppearance.AppCompat.Button" />
 
@@ -124,8 +124,8 @@
                     android:id="@+id/txtMovieSummary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:textSize="18sp"
+                    android:padding="@dimen/summary_padding"
+                    android:textSize="@dimen/summary_text_size"
                     android:text="@string/dummy_text_review"
                     tools:text="@string/dummy_text_review" />
             </LinearLayout>
@@ -135,8 +135,8 @@
             android:id="@+id/cv_trailer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="1dp"
-            app:cardElevation="2dp">
+            android:layout_marginTop="@dimen/trailer_margin_top"
+            app:cardElevation="@dimen/trailer_card_elevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -148,21 +148,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/expLV">
-
                 </ExpandableListView>
-                
-              <!--  <TextView
-                    android:id="@+id/txtMoviePlay"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/play"
-                    android:gravity="center"
-                    android:paddingLeft="8dp"
-                    android:paddingTop="12dp"
-                    android:text="Trailer 1"
-                    android:layout_marginBottom="8dp"
-                    android:divider="@android:color/darker_gray"
-                    android:textSize="16sp" />-->
 
             </LinearLayout>
         </android.support.v7.widget.CardView>
@@ -171,9 +157,9 @@
             android:id="@+id/cv_review"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:layout_marginTop="1dp"
-            app:cardElevation="2dp">
+            android:layout_marginBottom="@dimen/review_margin_bottom"
+            android:layout_marginTop="@dimen/review_margin_top"
+            app:cardElevation="@dimen/review_card_elevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -183,7 +169,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
+                    android:padding="@dimen/review_padding"
                     android:text="Reviews"
                     android:textAppearance="@style/TextAppearance.AppCompat.Button" />
 
@@ -203,10 +189,10 @@
                             android:id="@+id/expandable_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingBottom="8dp"
-                            android:paddingLeft="8dp"
-                            android:paddingRight="8dp"
-                            android:textSize="18sp"
+                            android:paddingBottom="@dimen/exp_text_padding"
+                            android:paddingLeft="@dimen/exp_text_padding"
+                            android:paddingRight="@dimen/exp_text_padding"
+                            android:textSize="@dimen/exp_text_size"
                             android:textStyle="italic"
                             tools:text="@string/dummy_text_review" />
 
@@ -216,7 +202,7 @@
                             android:id="@+id/expand_collapse"
                             android:background="@android:color/transparent"
                             android:layout_gravity="right|bottom"
-                            android:padding="16dp"/>
+                            android:padding="@dimen/exp_collapse_icon_padding"/>
 
                     </com.ms.square.android.expandabletextview.ExpandableTextView>
 

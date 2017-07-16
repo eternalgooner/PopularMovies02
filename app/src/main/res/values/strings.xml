@@ -52,6 +52,21 @@
     <string name="noTrailers">no trailers</string>
     <string name="noReviewsYet">no reviews yet</string>
     <string name="id">id</string>
+    <string name="reviews">reviews</string>
+    <string name="videos">videos</string>
+    <string name="youtube_url">vnd.youtube:</string>
+    <string name="theMovieDbTrailerQuery">theMovieDbTrailerQuery</string>
+    <string name="theMovieDbReviewQuery">theMovieDbReviewQuery</string>
+    <string name="out_of_ten">/10</string>
+    <string name="movieId">movieId</string>
+    <string name="dbAction">dbAction</string>
+    <string name="removed_from_Favourites">removed from Favourites</string>
+    <string name="added_to_Favourites">added to Favourites</string>
+    <string name="Trailers">Trailers</string>
+    <string name="content">content</string>
+    <string name="author">author</string>
+    <string name="key">key</string>
+    <string name="Trailer_">Trailer</string>
 
 
 </resources>

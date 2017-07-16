@@ -12,11 +12,17 @@ import david.com.popularmovies.model.Movie;
 
 /**
  * Created by David on 08-Jul-17.
+ *
+ * class that starts a service to either insert or delete from a DB
  */
 
 public class InsertOrDeleteFromDbService extends IntentService {
     private static final int INSERT_TO_DATABASE = 1;
     private static final int DELETE_FROM_DATABSE = -1;
+    private static final String INSERT_OR_DELETE_FROM_DB = "InsertOrDeleteFromDbService";
+    private static final String MOVIE_ID = "movieId";
+    private static final String SELECTED_MOVIE = "selectedMovie";
+    private static final String DB_ACTION = "dbAction";
     private static final String TAG = InsertOrDeleteFromDbService.class.getSimpleName();
 
     /**
@@ -29,15 +35,15 @@ public class InsertOrDeleteFromDbService extends IntentService {
     }
 
     public InsertOrDeleteFromDbService() {
-        super("InsertOrDeleteFromDbService");
+        super(INSERT_OR_DELETE_FROM_DB);
     }
 
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        String movieId = intent.getStringExtra("movieId");
-        Movie selectedMovie = intent.getParcelableExtra("selectedMovie");
-        int actionToTake = intent.getIntExtra("dbAction", 0);
+        String movieId = intent.getStringExtra(MOVIE_ID);
+        Movie selectedMovie = intent.getParcelableExtra(SELECTED_MOVIE);
+        int actionToTake = intent.getIntExtra(DB_ACTION, 0);
         Log.d(TAG, "entering onHandleRequest, movie id is: " + movieId + " AND actionToTake is: " + actionToTake);
 
         if(actionToTake == INSERT_TO_DATABASE){
@@ -53,8 +59,7 @@ public class InsertOrDeleteFromDbService extends IntentService {
         Log.d(TAG, "entering deleteFromDatabase() method with movie id: " + movieId);
         Uri uri = FavMoviesContract.FavMovieEntry.CONTENT_URI;
         uri = uri.buildUpon().appendPath(movieId).build();
-        //int transactionResult = getContentResolver().delete(uri, "movieId", movieIds);
-        getContentResolver().delete(uri, "movieId", movieIds);
+        getContentResolver().delete(uri, MOVIE_ID, movieIds);
     }
 
     private void insertToDatabase(Movie movie) {
@@ -64,8 +69,8 @@ public class InsertOrDeleteFromDbService extends IntentService {
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_RATING, movie.getmRating());
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_YEAR, movie.getmYear());
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_SUMMARY, movie.getmSummary());
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, movie.getmReview());                //TODO defect, videoKeys[] can be null if no trailers, need check...
-        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, movie.getmTrailer());                   //TODO defect, reviews[] can be null if no reviews, need check...
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_TRAILER, movie.getmReview());
+        contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_REVIEW, movie.getmTrailer());
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_MOVIE_ID, movie.getmMovieId());
         contentValues.put(FavMoviesContract.FavMovieEntry.COLUMN_POSTER_PATH, movie.getmPosterPath());
 

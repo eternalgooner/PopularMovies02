@@ -73,7 +73,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private TextView releaseDate;
     private ImageButton mFavStar;
     protected TextView movieSummary;
-    //private LinearLayout linearLayout;
     private ExpandableTextView expandableTextView;
     private boolean mIsFavourite;
     private String[] videoKeys;
@@ -90,8 +89,13 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private static final int THE_MOVIE_DB_TRAILER_LOADER = 61;
     private static final int INSERT_ACTION = 1;
     private static final int DELETE_ACTION = -1;
-    //private MainActivity.MenuState cameFromMenuState;
     private int currentMenu = 0;
+    private static final int START = 0;
+    private static final int END = 4;
+    private static final int MENU_FAVOURITES = 3;
+    private static final String REVIEW_SEPARATOR = "\"\n\n          -----------------------------------------------\n\n";
+    private static final String SEMI_COLON = ":";
+    private static final String NEW_LINE = "\n\"";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +113,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         releaseDate = (TextView) findViewById(R.id.txtMovieReleaseDate);
         movieSummary = (TextView) findViewById(R.id.txtMovieSummary);
         mFavStar = (ImageButton) findViewById(R.id.imgFavStar);
-        //linearLayout = (LinearLayout) findViewById(R.id.ll_play_trailer);
         expandableTextView = (ExpandableTextView) findViewById(R.id.expandable_text_view);
         listTrailerView = (ExpandableListView) findViewById(R.id.expLV);
 
@@ -118,17 +121,16 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         if(savedInstanceState != null){
             mIsFavourite = savedInstanceState.getBoolean(getString(R.string.isFav));
         }else {
-            mIsFavourite = bundle.getBoolean("isFav");
+            mIsFavourite = bundle.getBoolean(getString(R.string.isFav));
         }
 
-        //cameFromMenuState = (MainActivity.MenuState) bundle.get(getApplicationContext().getString(R.string.menuState));
-        currentMenu = getIntent().getIntExtra("currentMenu", 5);
+        currentMenu = getIntent().getIntExtra(getString(R.string.currentMenu), 5);
         Log.d(TAG, "came from menu state: " + currentMenu);
 
         if(isNetworkAvailable() && !mIsFavourite){
             Log.d("TAG --- +++", "newtowrk is available & movie is not a FAV ");
-            loadMovieReview("reviews");
-            getTrailerData("videos");
+            loadMovieReview(getString(R.string.reviews));
+            getTrailerData(getString(R.string.videos));
         }else{
             Log.d("TAG --- +++", "MOVIE IS FAV");
             loadLocalMovieData();
@@ -136,10 +138,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
         if(mIsFavourite){
             mFavStar.setImageResource(R.drawable.fav_star_on);
-            //mIsFavourite = false;
         }else {
             mFavStar.setImageResource(R.drawable.fav_star_off);
-            //mIsFavourite = true;
         }
 
         mFavStar.setOnClickListener(new View.OnClickListener() {
@@ -162,7 +162,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void playTrailer(String trailerId) {
-        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailerId));
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.youtube_url) + trailerId));
 
         PackageManager packageManager = getPackageManager();
         List activities = packageManager.queryIntentActivities(appIntent, PackageManager.MATCH_DEFAULT_ONLY);
@@ -175,10 +175,10 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     private void getTrailerData(String videos) {
         String movieId = selectedMovie.getmMovieId();
-        URL myUrl = NetworkUtils.buildUrl(videos, getApplicationContext(), movieId);
+        URL myUrl = NetworkUtils.buildUrl(videos,movieId);
 
         Bundle queryBundle = new Bundle();
-        queryBundle.putString("theMovieDbTrailerQuery", myUrl.toString());
+        queryBundle.putString(getString(R.string.theMovieDbTrailerQuery), myUrl.toString());
 
         LoaderManager loaderManager = getSupportLoaderManager();
         Loader<String> theMovieDbLoader = loaderManager.getLoader(THE_MOVIE_DB_TRAILER_LOADER);
@@ -188,10 +188,10 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     private void loadMovieReview(String reviews) {
         String movieId = selectedMovie.getmMovieId();
-        URL myUrl = NetworkUtils.buildUrl(reviews, getApplicationContext(), movieId);
+        URL myUrl = NetworkUtils.buildUrl(reviews, movieId);
 
         Bundle queryBundle = new Bundle();
-        queryBundle.putString("theMovieDbReviewQuery", myUrl.toString());
+        queryBundle.putString(getString(R.string.theMovieDbReviewQuery), myUrl.toString());
 
         LoaderManager loaderManager = getSupportLoaderManager();
 
@@ -214,7 +214,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         for(int i = 0; i < trailerList.size(); ++i){
             Log.d(TAG, "key is: " + trailerList.get(i));
         }
-        addExtraTrailerViewsIfNeeded();
+        if(trailerList.size() > 1) addExtraTrailerViewsIfNeeded();
     }
 
     private boolean isNetworkAvailable(){
@@ -225,39 +225,20 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         return ((activeNetworkInfo != null) && (activeNetworkInfo.isConnected()));
     }
 
-//    private void displayMovieDetails(HashMap movie) {
-//        Log.d(TAG, "entering displayMovieDetails");
-//        StringBuilder movieYear = new StringBuilder((String) movie.get("releaseDate"));
-//        String year = movieYear.substring(0,4);
-//        String posterPrefix = getString(R.string.url_poster_prefix);
-//        movieTitle.setText((String)movie.get("title"));
-//        movieSummary.setText((String)movie.get("overview"));
-//        userRating.setText((String)movie.get("voteAverage") + "/10");
-//        releaseDate.setText(year);
-//        if(!mIsFavourite){
-//            Picasso.with(getApplicationContext()).load(posterPrefix + (String) movie.get("posterPath")).into(moviePoster);
-//        }else{
-//            moviePoster.setPadding(24, 224, 24, 24);
-//            moviePoster.setImageResource(R.mipmap.movie_projector);
-//        }
-//
-//        Log.d(TAG, "poster path is: " + movie.get("posterPath"));
-//    }
-
     private void displayMovieDetails(Movie movie) {
         Log.d(TAG, "entering displayMovieDetails");
         StringBuilder movieYear = new StringBuilder(movie.getmYear());
-        String year = movieYear.substring(0,4);
-        String posterPrefix = getString(R.string.url_poster_prefix);
+        String year = movieYear.substring(START, END);
+        //String posterPrefix = getString(R.string.url_poster_prefix);
         movieTitle.setText(movie.getmTitle());
         movieSummary.setText(movie.getmSummary());
-        userRating.setText(movie.getmRating() + "/10");
+        userRating.setText(movie.getmRating() + getString(R.string.out_of_ten));
         releaseDate.setText(year);
         if(!mIsFavourite){
             Log.d(TAG, "in displayMovieDetails(), setting real image as poster - not a FAV");
             Picasso.with(getApplicationContext()).load(movie.getmPosterPath()).into(moviePoster);
         }else{
-            if(currentMenu != 3){
+            if(currentMenu != MENU_FAVOURITES){
                 Log.d(TAG, "in displayMovieDetails(), setting real image as poster - FAV from real menu");
                 Picasso.with(getApplicationContext()).load(movie.getmPosterPath()).into(moviePoster);
             }else {
@@ -279,16 +260,16 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private void clickFav(View view){
         if(mIsFavourite){
             Intent dbIntent = new Intent(this, InsertOrDeleteFromDbService.class);
-            dbIntent.putExtra("movieId", selectedMovie.getmMovieId());
-            dbIntent.putExtra("dbAction", DELETE_ACTION);
+            dbIntent.putExtra(getString(R.string.movieId), selectedMovie.getmMovieId());
+            dbIntent.putExtra(getString(R.string.dbAction), DELETE_ACTION);
             startService(dbIntent);
             mFavStar.setImageResource(R.drawable.fav_star_off);
-            Toast.makeText(getApplicationContext(), "removed from Favourites", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.removed_from_Favourites, Toast.LENGTH_SHORT).show();
             mIsFavourite = false;
         }else{
             mFavStar.setImageResource(R.drawable.fav_star_on);
             addMovieToFavUsingService();
-            Toast.makeText(getApplicationContext(), "added to Favourites", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.added_to_Favourites, Toast.LENGTH_SHORT).show();
             mIsFavourite = true;
         }
     }
@@ -296,15 +277,14 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private void addExtraTrailerViewsIfNeeded() {
         Log.d(TAG, "entering addExtraTrailerViewsIfNeeded");
         listDataHeader = new ArrayList<>();
-        listDataHeader.add("Trailers");
+        listDataHeader.add(getString(R.string.Trailers));
         listHash = new HashMap<>();
 
         Log.d(TAG, "debugging trailer list in add extraTrailerViews ======= items in list is now:" + Arrays.toString(trailerList.toArray()));
         listHash.put(listDataHeader.get(0), trailerList);
         Log.d(TAG, "list data header index 0 is:" + listDataHeader.get(0).toString());
         Log.d(TAG, "1st item in list hash is:" + listHash.get(listDataHeader.get(0)).toString());
-        Log.d(TAG, "xxxxxxxxxx listhash size : " + listHash.size());
-        //Log.d(TAG, "xxxxxxxxxx debugging trailer list in hashmap ======= items in list is now:" + Arrays.toString(listHash.get(0).toArray()));
+        Log.d(TAG, "listhash size : " + listHash.size());
         listTrailerAdapter = new ExpandableListAdapter(this, listDataHeader, listHash);
         listTrailerView.setAdapter(listTrailerAdapter);
         listTrailerView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
@@ -360,8 +340,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
 
     private void addMovieToFavUsingService(){
         Intent dbIntent = new Intent(this, InsertOrDeleteFromDbService.class);
-        dbIntent.putExtra("selectedMovie", selectedMovie);
-        dbIntent.putExtra("dbAction", INSERT_ACTION);
+        dbIntent.putExtra(getString(R.string.selectedMovie), selectedMovie);
+        dbIntent.putExtra(getString(R.string.dbAction), INSERT_ACTION);
         startService(dbIntent);
     }
 
@@ -371,11 +351,11 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         return new AsyncTaskLoader<String>(this) {
             @Override
             public String loadInBackground() {
-                String theMovieDbReviewQueryString = args.getString("theMovieDbReviewQuery");
-                String theMovieDbTrailerQueryString = args.getString("theMovieDbTrailerQuery");
-                if(id == 60){
+                String theMovieDbReviewQueryString = args.getString(getString(R.string.theMovieDbReviewQuery));
+                String theMovieDbTrailerQueryString = args.getString(getString(R.string.theMovieDbTrailerQuery));
+                if(id == THE_MOVIE_DB_REVIEW_LOADER){
                      return processReviewQueryData(theMovieDbReviewQueryString);
-                }else if(id == 61){
+                }else if(id == THE_MOVIE_DB_TRAILER_LOADER){
                     return processTrailerQueryData(theMovieDbTrailerQueryString);
                 }
                 return null;
@@ -458,46 +438,36 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         reviews = new String[jsonMovieReviews.length()];
         authors = new String[jsonMovieReviews.length()];
 
-        int nextReview = 0;
-        for(String review : reviews){
-            JSONObject reviewDetails = JsonUtils.getJSONObject(jsonMovieReviews, nextReview);
-            reviews[nextReview] = JsonUtils.getString(reviewDetails, "content");
-            authors[nextReview] = JsonUtils.getString(reviewDetails, "author");
-            ++nextReview;
+        for(int i = 0; i < reviews.length; ++i){
+            JSONObject reviewDetails = JsonUtils.getJSONObject(jsonMovieReviews, i);
+            reviews[i] = JsonUtils.getString(reviewDetails, getString(R.string.content));
+            authors[i] = JsonUtils.getString(reviewDetails, getString(R.string.author));
         }
 
         for(int i = 0; i < reviews.length; ++i){
-            expandableTextView.setText(expandableTextView.getText() + authors[i] + ":" + "\n\"" + reviews[i] + "\"\n\n          -----------------------------------------------\n\n");
+            expandableTextView.setText(expandableTextView.getText() + authors[i] + SEMI_COLON + NEW_LINE + reviews[i] + REVIEW_SEPARATOR);
         }
     }
 
     private void getVideoData(JSONObject videoObject) {
         Log.d(TAG, "entering getVideoData");
-        JSONArray jsonMovieVideos = JsonUtils.getJSONArray(videoObject, "results");
+        JSONArray jsonMovieVideos = JsonUtils.getJSONArray(videoObject, getString(R.string.results));
 
         videoKeys = new String[jsonMovieVideos.length()];
         trailerList = new ArrayList<>();
 
-        int nextTrailer = 0;
-        for(String trailer : videoKeys){    //TODO change to for loop
-            JSONObject reviewDetails = JsonUtils.getJSONObject(jsonMovieVideos, nextTrailer);
-            videoKeys[nextTrailer] = JsonUtils.getString(reviewDetails, "key");
-
-            trailerList.add("Trailer " + nextTrailer);
-
-            ++nextTrailer;
+        for(int i = 0; i < videoKeys.length; ++i){
+            JSONObject reviewDetails = JsonUtils.getJSONObject(jsonMovieVideos, i);
+            videoKeys[i] = JsonUtils.getString(reviewDetails, getString(R.string.key));
+            trailerList.add(getString(R.string.Trailer_) + i);
         }
-
         Log.d(TAG, "debugging trailer list ======= items are:" + Arrays.toString(trailerList.toArray()));
-
 
         for(int i = 0; i < videoKeys.length; ++i){
             Log.d(TAG, "key is: " + videoKeys[i]);
         }
-        //if(videoKeys.length > 1) addExtraTrailerViewsIfNeeded();
-        addExtraTrailerViewsIfNeeded();
+        if(videoKeys.length > 1) addExtraTrailerViewsIfNeeded();
     }
-
 
     @Override
     public void onLoaderReset(Loader<String> loader) {

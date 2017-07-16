@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void loadMovieList(String sortType) {
         Log.d(TAG, "entering loadMovieList for " + sortType);
-        URL myUrl = NetworkUtils.buildUrl(sortType, getApplicationContext(), getString(R.string.default_id));
+        URL myUrl = NetworkUtils.buildUrl(sortType, getString(R.string.default_id));
 
         Bundle queryBundle = new Bundle();
         queryBundle.putString(getString(R.string.theMovieDb) + sortType + getString(R.string.Query), myUrl.toString());

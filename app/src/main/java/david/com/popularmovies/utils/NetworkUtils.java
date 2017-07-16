@@ -36,45 +36,37 @@ import david.com.popularmovies.R;
 public class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
-    //TODO get rid of static context
-    private static Context context;
-    private static String base_url_popular;
-    private static String base_url_top_rated;
-    private static String base_url_trailers;
-    private static String base_url_reviews;
-    private static String apiKey;
-
-    private static void initData() {
-        apiKey = getKey();
-        base_url_popular = context.getString(R.string.base_url_popular) + apiKey;
-        base_url_top_rated = context.getString(R.string.base_url_top_rated) + apiKey;
-        base_url_trailers = context.getString(R.string.base_url);
-        base_url_reviews = context.getString(R.string.base_url);
-    }
+    private static String base_url_popular = "https://api.themoviedb.org/3/movie/popular?api_key=" + getKey();
+    private static String base_url_top_rated = "https://api.themoviedb.org/3/movie/top_rated?api_key=" + getKey();
+    private static String base_url_trailers = "https://api.themoviedb.org/3/movie/";
+    private static String base_url_reviews = "https://api.themoviedb.org/3/movie/";
+    private static final String MOST_POPULAR = "mostPopular";
+    private static final String HIGHEST_RATED = "highestRated";
+    private static final String VIDEOS = "videos";
+    private static final String VIDEO_URL = "/videos?api_key=";
+    private static final String REVIEW_URL = "/reviews?api_key=";
 
     private static String getKey() {
         String apiKey = BuildConfig.MY_MOVIEDB_API_KEY;
         return apiKey;
     }
 
-    public static URL buildUrl(String sortType, Context context, String id){
+    public static URL buildUrl(String sortType, String id){
         Log.d(TAG, "NU entering buildUrl");
-        NetworkUtils.context = context;
-        initData();
-        String sortParam = "";
+        String sortParam = null;
 
-        if(sortType.equals("mostPopular")){
+        if(sortType.equals(MOST_POPULAR)){
             Log.d(TAG, "match found: mostPopular");
             sortParam = base_url_popular;
-        }else if(sortType.equals("highestRated")){
+        }else if(sortType.equals(HIGHEST_RATED)){
             Log.d(TAG, "match found: highestRated");
             sortParam = base_url_top_rated;
-        }else if(sortType.equals("videos")){
+        }else if(sortType.equals(VIDEOS)){
             Log.d(TAG, "match found: videos");
-            sortParam = base_url_trailers + id + "/videos?api_key=" + apiKey;
+            sortParam = base_url_trailers + id + VIDEO_URL + getKey();
         }else if(sortType.equals("reviews")){
             Log.d(TAG, "match found: reviews");
-            sortParam = base_url_reviews + id + "/reviews?api_key=" + apiKey;
+            sortParam = base_url_reviews + id + REVIEW_URL + getKey();
             Log.d(TAG, "sorParam being used is: " + sortParam);
         }
 
