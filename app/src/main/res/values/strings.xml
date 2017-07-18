@@ -11,10 +11,10 @@
     <string name="message_no_network">please check your network connection and try again</string>
 
     <!-- network request strings -->
-    <string name="url_poster_prefix">http://image.tmdb.org/t/p/w500/</string>
-    <string name="base_url_top_rated">https://api.themoviedb.org/3/movie/top_rated?api_key=</string>
-    <string name="base_url_popular">https://api.themoviedb.org/3/movie/popular?api_key=</string>
-    <string name="base_url">https://api.themoviedb.org/3/movie/</string>
+    <string name="url_poster_prefix" translatable="false">http://image.tmdb.org/t/p/w500/</string>
+    <string name="base_url_top_rated" translatable="false">https://api.themoviedb.org/3/movie/top_rated?api_key=</string>
+    <string name="base_url_popular" translatable="false">https://api.themoviedb.org/3/movie/popular?api_key=</string>
+    <string name="base_url" translatable="false">https://api.themoviedb.org/3/movie/</string>
 
     <!-- Activity titles -->
     <string name="title_movie_details">Movie Details</string>
@@ -27,51 +27,51 @@
     <string name="trailer_">Trailer</string>
     <string name="Most_Popular">Most Popular</string>
     <string name="default_id">0</string>
-    <string name="theMovieDb">theMovieDb</string>
-    <string name="Query">Query</string>
-    <string name="emptyString" />
-    <string name="selectedMovie">selectedMovie</string>
-    <string name="isFav">isFav</string>
-    <string name="menuState">menuState</string>
-    <string name="movieIdEqualsQuestionMark">movieId=?</string>
+    <string name="theMovieDb" translatable="false">theMovieDb</string>
+    <string name="Query" translatable="false">Query</string>
+    <string name="emptyString" translatable="false" />
+    <string name="selectedMovie" translatable="false">selectedMovie</string>
+    <string name="isFav" translatable="false">isFav</string>
+    <string name="menuState" translatable="false">menuState</string>
+    <string name="movieIdEqualsQuestionMark" translatable="false">movieId=?</string>
     <string name="Favourites">Favourites</string>
-    <string name="tmdbMostPopQuery">theMovieDbmostPopularQuery</string>
-    <string name="tmdbHighestRatedQuery">theMovieDbhighestRatedQuery</string>
-    <string name="results">results</string>
-    <string name="poster_path">poster_path</string>
-    <string name="base_poster_path">https://image.tmdb.org/t/p/w500/</string>
-    <string name="favourites">favourites</string>
-    <string name="movieCollection">movieCollection</string>
-    <string name="posterPaths">posterPaths</string>
-    <string name="menu">menu</string>
-    <string name="currentMenu">currentMenu</string>
+    <string name="tmdbMostPopQuery" translatable="false">theMovieDbmostPopularQuery</string>
+    <string name="tmdbHighestRatedQuery" translatable="false">theMovieDbhighestRatedQuery</string>
+    <string name="results" translatable="false">results</string>
+    <string name="poster_path" translatable="false">poster_path</string>
+    <string name="base_poster_path" translatable="false">https://image.tmdb.org/t/p/w500/</string>
+    <string name="favourites" translatable="false">favourites</string>
+    <string name="movieCollection" translatable="false">movieCollection</string>
+    <string name="posterPaths" translatable="false">posterPaths</string>
+    <string name="menu" translatable="false">menu</string>
+    <string name="currentMenu" translatable="false">currentMenu</string>
     <string name="original_title">original_title</string>
     <string name="vote_average">vote_average</string>
     <string name="release_date">release_date</string>
     <string name="overview">overview</string>
     <string name="noTrailers">no reviews</string>
     <string name="noReviewsYet">no reviews yet</string>
-    <string name="id">id</string>
+    <string name="id" translatable="false">id</string>
     <string name="reviews">reviews</string>
-    <string name="videos">videos</string>
-    <string name="youtube_url">vnd.youtube:</string>
-    <string name="theMovieDbTrailerQuery">theMovieDbTrailerQuery</string>
-    <string name="theMovieDbReviewQuery">theMovieDbReviewQuery</string>
+    <string name="videos" translatable="false">videos</string>
+    <string name="youtube_url" translatable="false">vnd.youtube:</string>
+    <string name="theMovieDbTrailerQuery" translatable="false">theMovieDbTrailerQuery</string>
+    <string name="theMovieDbReviewQuery" translatable="false">theMovieDbReviewQuery</string>
     <string name="out_of_ten">/10</string>
-    <string name="movieId">movieId</string>
-    <string name="dbAction">dbAction</string>
+    <string name="movieId" translatable="false">movieId</string>
+    <string name="dbAction" translatable="false">dbAction</string>
     <string name="removed_from_Favourites">removed from Favourites</string>
     <string name="added_to_Favourites">added to Favourites</string>
     <string name="Trailers">Trailers</string>
-    <string name="content">content</string>
-    <string name="author">author</string>
-    <string name="key">key</string>
+    <string name="content" translatable="false">content</string>
+    <string name="author" translatable="false">author</string>
+    <string name="key" translatable="false">key</string>
     <string name="Trailer_">Trailer</string>
     <string name="Reviews">Reviews</string>
     <string name="_1hr_30m">1hr 30m</string>
     <string name="summary">Summary</string>
     <string name="fav_image">favourite image</string>
-    <string name="collapse_icon">collapse icon</string>
+    <string name="collapse_icon" >collapse icon</string>
     <string name="default_movie_poster">default_movie_poster</string>
 
 
