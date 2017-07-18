@@ -71,6 +71,8 @@
     <string name="_1hr_30m">1hr 30m</string>
     <string name="summary">Summary</string>
     <string name="fav_image">favourite image</string>
+    <string name="collapse_icon">collapse icon</string>
+    <string name="default_movie_poster">default_movie_poster</string>
 
 
 </resources>

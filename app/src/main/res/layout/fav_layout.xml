@@ -13,9 +13,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/fav_layout_img"
-            android:paddingLeft="@dimen/fav_layout_padding_left"
+            android:paddingStart="@dimen/fav_layout_padding_left"
             android:layout_margin="@dimen/fav_layout_margin"
-            />
+            android:contentDescription="@string/default_movie_poster" />
 
         <TextView
             android:id="@+id/fav_layout_txt"

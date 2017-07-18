@@ -10,5 +10,5 @@
         android:paddingBottom="@dimen/list_trailer_padding"
         android:id="@+id/lblListHeader"
         android:textSize="@dimen/list_trailer_text_size"
-        android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"/>
+        android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"/>
 </LinearLayout>

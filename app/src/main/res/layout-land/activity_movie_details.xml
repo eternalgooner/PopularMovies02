@@ -202,8 +202,9 @@
                             android:layout_height="wrap_content"
                             android:id="@+id/expand_collapse"
                             android:background="@android:color/transparent"
-                            android:layout_gravity="right|bottom"
-                            android:padding="@dimen/exp_collapse_icon_padding"/>
+                            android:layout_gravity="end|bottom"
+                            android:padding="@dimen/exp_collapse_icon_padding"
+                            android:contentDescription="@string/collapse_icon" />
 
                     </com.ms.square.android.expandabletextview.ExpandableTextView>
 
