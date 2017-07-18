@@ -250,26 +250,28 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Intent intent = new Intent(MainActivity.this, MovieDetailsActivity.class);
 
         if(mMenuState == MenuState.MENU_FAV){
+            Log.e(TAG, "menu state is FAV");
             Movie selectedFavMovie;
             Cursor cursor = getClickedMovieData(clickedItem);
 
-            Log.e("cursor count is: ", cursor.getCount()+getString(R.string.emptyString));
+            Log.e(TAG, cursor.getCount()+getString(R.string.emptyString));
             while(cursor.moveToNext()){
-                Log.e("debug cursor", cursor.getString(0));
-                Log.e("debug cursor", cursor.getString(1));
-                Log.e("debug cursor", cursor.getString(2));
-                Log.e("debug cursor", cursor.getString(3));
-                Log.e("debug cursor", cursor.getString(4));
-                Log.e("debug cursor", cursor.getString(5));
-                Log.e("debug cursor", cursor.getString(6));
-                Log.e("debug cursor", cursor.getString(7));
-                Log.e("debug cursor", cursor.getString(8));
+                Log.e(TAG, cursor.getString(0));
+                Log.e(TAG, cursor.getString(1));
+                Log.e(TAG, cursor.getString(2));
+                Log.e(TAG, cursor.getString(3));
+                Log.e(TAG, cursor.getString(4));
+                Log.e(TAG, cursor.getString(5));
+                Log.e(TAG, cursor.getString(6));
+                Log.e(TAG, cursor.getString(7));
+                Log.e(TAG, cursor.getString(8));
             }
             selectedFavMovie = CursorUtils.convertCursorToMovieObject(cursor);
             intent.putExtra(getString(R.string.currentMenu), currentMenu);
             intent.putExtra(getString(R.string.selectedMovie), selectedFavMovie);
             movieBundle.putBoolean(getString(R.string.isFav), true);
         }else{
+            Log.e(TAG, "menu state is NOT FAV");
             intent.putExtra(getString(R.string.selectedMovie), newMovieList.get(clickedItem));
             intent.putExtra(getString(R.string.currentMenu), currentMenu);
             Log.e(TAG, "add movie here into intent. Movie poster path is " + newMovieList.get(clickedItem).getmPosterPath());

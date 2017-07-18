@@ -194,27 +194,29 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         queryBundle.putString(getString(R.string.theMovieDbReviewQuery), myUrl.toString());
 
         LoaderManager loaderManager = getSupportLoaderManager();
-
         loaderManager.initLoader(THE_MOVIE_DB_REVIEW_LOADER, queryBundle, this).forceLoad();
     }
 
     private void loadLocalMovieData() {
-        Log.d("TAG --- +++", "in loadLocalMovieData() ");
+        Log.d(TAG, "in loadLocalMovieData() ");
         String review = selectedMovie.getmReview();
-        Log.d("TAG --- +++", "review data is: " + review);
+        Log.d(TAG, "review data is: " + review);
         expandableTextView.setText(review);
 
-        String trailerKey = selectedMovie.getmTrailer();
-        trailerList = new ArrayList<>();
-        trailerList.add(trailerKey);
+        if(isNetworkAvailable()){
+            getTrailerData(getString(R.string.videos));
+        }else {
+            String trailerKey = selectedMovie.getmTrailer();
+            trailerList = new ArrayList<>();
+            trailerList.add(trailerKey);
 
-        Log.d(TAG, "debugging trailer list ======= items are:" + Arrays.toString(trailerList.toArray()));
+            Log.d(TAG, "debugging trailer list ======= items are:" + Arrays.toString(trailerList.toArray()));
 
-
-        for(int i = 0; i < trailerList.size(); ++i){
-            Log.d(TAG, "key is: " + trailerList.get(i));
+            for(int i = 0; i < trailerList.size(); ++i){
+                Log.d(TAG, "key is: " + trailerList.get(i));
+            }
+            if(trailerList.size() > 1) addExtraTrailerViewsIfNeeded();
         }
-        if(trailerList.size() > 1) addExtraTrailerViewsIfNeeded();
     }
 
     private boolean isNetworkAvailable(){
@@ -229,7 +231,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         Log.d(TAG, "entering displayMovieDetails");
         StringBuilder movieYear = new StringBuilder(movie.getmYear());
         String year = movieYear.substring(START, END);
-        //String posterPrefix = getString(R.string.url_poster_prefix);
         movieTitle.setText(movie.getmTitle());
         movieSummary.setText(movie.getmSummary());
         userRating.setText(movie.getmRating() + getString(R.string.out_of_ten));
@@ -241,6 +242,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             if(currentMenu != MENU_FAVOURITES){
                 Log.d(TAG, "in displayMovieDetails(), setting real image as poster - FAV from real menu");
                 Picasso.with(getApplicationContext()).load(movie.getmPosterPath()).into(moviePoster);
+                //TODO put reviews here
+                loadMovieReview(getString(R.string.reviews));
             }else {
                 Log.d(TAG, "in displayMovieDetails(), setting default image as poster");
                 moviePoster.setPadding(24, 224, 24, 24);
@@ -444,6 +447,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             authors[i] = JsonUtils.getString(reviewDetails, getString(R.string.author));
         }
 
+        //reset review text to empty string - to override default "no reviews" text
+        expandableTextView.setText(getString(R.string.emptyString));
         for(int i = 0; i < reviews.length; ++i){
             expandableTextView.setText(expandableTextView.getText() + authors[i] + SEMI_COLON + NEW_LINE + reviews[i] + REVIEW_SEPARATOR);
         }

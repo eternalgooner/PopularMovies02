@@ -83,7 +83,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="1hr 30m"
+                        android:text="@string/_1hr_30m"
                         android:padding="@dimen/movie_duration_padding"
                         android:textSize="@dimen/movie_duration_text_size"
                         tools:text="1hr 30m" />
@@ -93,7 +93,8 @@
                         android:padding="@dimen/fav_star_padding"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@null" />
+                        android:background="@null"
+                        android:contentDescription="@string/fav_image"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -116,7 +117,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/summary_padding"
-                    android:text="Summary"
+                    android:text="@string/summary"
                     android:textAppearance="@style/TextAppearance.AppCompat.Button" />
 
                 <TextView
@@ -170,7 +171,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/review_padding"
-                    android:text="Reviews"
+                    android:text="@string/Reviews"
                     android:textAppearance="@style/TextAppearance.AppCompat.Button" />
 
 

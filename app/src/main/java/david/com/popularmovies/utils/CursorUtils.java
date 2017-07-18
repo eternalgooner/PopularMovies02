@@ -47,7 +47,7 @@ public class CursorUtils {
         movie.setmTrailer(cursor.getString(5));
         movie.setmReview(cursor.getString(6));
         movie.setmMovieId(cursor.getString(7));
-        movie.setmPosterPath(cursor.getString(7));
+        movie.setmPosterPath(cursor.getString(8));
 
         return movie;
     }

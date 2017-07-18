@@ -49,7 +49,7 @@
     <string name="vote_average">vote_average</string>
     <string name="release_date">release_date</string>
     <string name="overview">overview</string>
-    <string name="noTrailers">no trailers</string>
+    <string name="noTrailers">no reviews</string>
     <string name="noReviewsYet">no reviews yet</string>
     <string name="id">id</string>
     <string name="reviews">reviews</string>
@@ -67,6 +67,10 @@
     <string name="author">author</string>
     <string name="key">key</string>
     <string name="Trailer_">Trailer</string>
+    <string name="Reviews">Reviews</string>
+    <string name="_1hr_30m">1hr 30m</string>
+    <string name="summary">Summary</string>
+    <string name="fav_image">favourite image</string>
 
 
 </resources>
