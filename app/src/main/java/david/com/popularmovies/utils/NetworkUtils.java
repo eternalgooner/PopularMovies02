@@ -55,6 +55,7 @@ public class NetworkUtils {
         Log.d(TAG, "NU entering buildUrl");
         String sortParam = null;
 
+        //TODO SUGGESTION Consider using a switch statement instead of if...
         if(sortType.equals(MOST_POPULAR)){
             Log.d(TAG, "match found: mostPopular");
             sortParam = base_url_popular;
