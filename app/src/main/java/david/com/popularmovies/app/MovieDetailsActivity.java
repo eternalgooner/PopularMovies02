@@ -310,7 +310,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             }
         });
     }
-
+    //TODO SUGGESTION Include a count of Reviews/Trailers in their respective ExpandableListView heading e.g. Trailers (3)
     private void setListViewHeight(ExpandableListView parent, int groupPosition) {
         ExpandableListAdapter listAdapter = (ExpandableListAdapter) listTrailerView.getExpandableListAdapter();
         int totalHeight = 0;

@@ -287,12 +287,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private boolean checkIfMovieIsAlreadyInFavourites(int clickedItem) {
+        //TODO SUGGESTION The Java Naming Convention would suggest e.g. isMovieAlreadyInFavourites() as a more appropriate name for this method
         Cursor cursor = getClickedMovieData(clickedItem);
         if(cursor.getCount() < 1){
             return false;
         }else{
             return true;
         }
+        //TODO SUGGESTION You can simplify this method to: return getClickedMovieData(clickedItem).getCount() > 0;
     }
 
     private Cursor getClickedMovieData(int clickedItem) {

@@ -100,6 +100,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
                 holder.mFavImageView.setImageResource(R.mipmap.movie_projector);
                 holder.mTextView.setText(mMovieList.get(position).getmTitle());
                 holder.mTextView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
+                //TODO SUGGESTION Try avoid using deprecated code it may break your app in the future, consider using getColor(Color, Theme)
             }else{
                 if(!mCursor.moveToPosition(position)){
                     return;

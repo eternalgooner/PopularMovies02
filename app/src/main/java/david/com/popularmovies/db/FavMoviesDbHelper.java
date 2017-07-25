@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * Created by User on 6/6/2017.
  */
+//TODO SUGGESTION This 'User' fella is a prolific programmer, I see his code everywhere, or is he taking credit for your work :^)
 
 public class FavMoviesDbHelper extends SQLiteOpenHelper {
 
