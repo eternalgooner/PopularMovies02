@@ -103,10 +103,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Log.d(TAG, "entering onCreate");
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
 
+        //TODO SUGGESTION Consider moving the if and else parts into their own methods to keep your onCreate short, and possibly aid code reuse.
         //if null - load for the first time
         if(savedInstanceState == null){
             setContentView(R.layout.activity_main);
             getSupportActionBar().setSubtitle(getString(R.string.Most_Popular));
+            //TODO AWESOME Another simple UI addition that is UX++, letting the user know which pivot they're viewing
             mRecyclerView = (RecyclerView) findViewById(R.id.rv_moviePosters);
             newMovieList = new ArrayList<>();
             mMovieCollection = new MovieCollection(getApplicationContext());
@@ -370,6 +372,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         mMenuState = MenuState.MENU_FAV;
         txtNoNetworkMessage.setVisibility(View.INVISIBLE);
         mCursor = getAllFavMovies();
+        //TODO SUGGESTION If there are no Favourites added, maybe have some short text advising the user how they can add Favourites.
         refreshMovieList(mCursor);
         mMovieAdapter = new MovieAdapter(this, mCursor, this, getCurrentPosterPaths(newMovieList));
         mRecyclerView.setAdapter(mMovieAdapter);

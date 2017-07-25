@@ -20,5 +20,6 @@
             android:title="@string/menu_favourites"
             app:showAsAction="collapseActionView" />
     </group>
+<!-- TODO AWESOME This is a nice simple UI touch that is UX++ -->
 
 </menu>

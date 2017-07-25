@@ -226,6 +226,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         Log.d(TAG, "exiting isNetworkAvailable");
         return ((activeNetworkInfo != null) && (activeNetworkInfo.isConnected()));
     }
+    //TODO SUGGESTION The method isNetworkAvailable probably belongs in the NetworkUtils class
 
     private void displayMovieDetails(Movie movie) {
         Log.d(TAG, "entering displayMovieDetails");
@@ -247,6 +248,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             }else {
                 Log.d(TAG, "in displayMovieDetails(), setting default image as poster");
                 moviePoster.setPadding(24, 224, 24, 24);
+                //TODO SUGGESTION Set the above sizes in dimens.xml and retrieve them as follows
+                //TODO SUGGESTION  e.g. int paddingStart = (int) getResources().getDimension(R.dimen.poster_padding);
                 moviePoster.setImageResource(R.mipmap.movie_projector);
             }
         }
@@ -268,6 +271,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             startService(dbIntent);
             mFavStar.setImageResource(R.drawable.fav_star_off);
             Toast.makeText(getApplicationContext(), R.string.removed_from_Favourites, Toast.LENGTH_SHORT).show();
+            //TODO SUGGESTION The Toast is not necessary (and distracting to the User) since you already provide visual feedback with a change in image.
             mIsFavourite = false;
         }else{
             mFavStar.setImageResource(R.drawable.fav_star_on);

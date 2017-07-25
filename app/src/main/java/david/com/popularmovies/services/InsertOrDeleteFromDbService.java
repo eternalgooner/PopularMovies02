@@ -17,6 +17,7 @@ import david.com.popularmovies.model.Movie;
  */
 
 public class InsertOrDeleteFromDbService extends IntentService {
+    //TODO AWESOME  It's great you're using the different components the framework provides, an IntentService leveraging a Content Provider
     private static final int INSERT_TO_DATABASE = 1;
     private static final int DELETE_FROM_DATABSE = -1;
     private static final String INSERT_OR_DELETE_FROM_DB = "InsertOrDeleteFromDbService";
